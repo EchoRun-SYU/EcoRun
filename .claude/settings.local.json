@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__stitch__list_projects",
+      "mcp__stitch__list_screens",
+      "mcp__stitch__get_screen",
+      "Bash(mkdir -p /tmp/ecorun_screens)",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen1.jpg \"https://lh3.googleusercontent.com/aida/ADBb0ug-LxvoG7VvxHFBUJs-IqwN4YwtZhia0WS_4rtg9svXHIVCDDYmtYSEoAmWm-TkNOdBEL6GhoVMPZ0MF9RKbSHW1xMxPvFxASBEcrbmnTBA4HxPXYgsUqkS34LtHsdUiOFpPLw04uR2UxXS_cPKD-3_6sx6m2RcR7yLxgMFTg66y53oHCRwYPK72QLlb8zqeOHYQ_I2nPRGndQAS0PumkT6VO-ldOaOp921YRkjEMy3DQ9SkziJ6CUNxaAoRiafYf4-oo4WbuqaXg\")",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen2.jpg \"https://lh3.googleusercontent.com/aida/ADBb0ug5xOeEXI4VpiZbA2VaH6SZJqbZJoFjLkC7cBf8k5AmOEpbFSXHEBBYXe_uq_ntL1xuEDXyRBXTZloIoR1gmzIU5ZxJRfTUkvG7Zmd9gAuTQddgqHyaNyZv-LPDzJ09smAoj5787rNBrx_l5UiJIXr3XFdC5kEM-66XiOjBNOSynrYMkRjsKDsX0GFry3YkAfdv_Uqasnsr2RiYNnLNbPM8KA2bhNfBa3_OCmxe3adfJLtbHobWxPnqI6j6EzCHNFlkLmfBXy9hpiA\")",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen3.jpg \"https://lh3.googleusercontent.com/aida/ADBb0ujyBa9_OM73bXx-2meTL0qigR3F6AWy1ISn-6r8TnOlx5na8PmKuhQxgpx7aW1gvFOjAb2DUOmMS8-47YK4WsqxGAJrpWdGCT7CHVMh7MUdeQXwAN1JYbaVixdY1Zf2rjtBM8dvhuKSpRuGDSuDk4gGwLiv5L7GubbDBNqbqsB37N4lGQ7phumVFCc-9nTxOtPwa-yfVHmK5k0ghS-G0Fz9bOCq0dYElaSuuqbodMF9020QH688T481W912ZLJE7vlHtXF55jdRKg\")",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen4.jpg \"https://lh3.googleusercontent.com/aida/ADBb0ujYHHhWT0VcXPgY7QxNgfcpWEdao-yTvoT6k84No47El6z80-rQ0P2xsCz8faugfLnYpTp5Be5VfNKInRtD1zEoe24Ui0jyNB3qps9YNsi8a7Bb0qL9OZW8XFe4OKO-w3_nlbufIqthi0KZ0BPji5F8LNidfVzer29KPcBj7KS5kC2C-mgtqoj72ZK1D6lH6d0vQ2Eit5NZ8k24Y1r8nk5M2JHwtCj3EN5t-9Wa88W-H8S40Nvr2A2k6C5EVuMOmcowqZ-HEX1PGxw\")",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen5.jpg \"https://lh3.googleusercontent.com/aida/ADBb0ujUUTdxBbvEJURRqDgfOaugDfQApDw9wTwf5vUbQTe2fuz9ftSMKKT1qIgQ1a8yLj6KCF_uKiwKZioy5YnCuhfywGffxaOXDSbfYjG3uHOs9b9Ebp1FmIijIvrwSUxX27L_d1tlSyED7RjW-rHzgt_uwLZ5XFh5CKLpRLPLfUIa4OYtb47nF3Rbkso3A_iUI3nTlDkz6Z8W9uMVsSPSFrDPAJdaQEDj56Ss6kDcx1ztBmxTGH9_r6m7UDSHMp3u-R-iiplJ--TcKuc\")",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen6.jpg \"https://lh3.googleusercontent.com/aida/ADBb0uh3vpQanfbW5Qlzi0y8CVh5NIdGsuK4JsfDuRufyRvGSwpwUUTeWt335xOJR_vjrKUZeNb6ZyVeU1oVIvygAv3VZ0o_vJOJhcQARJ9QejIErEh3aq-W1kLFnLskzD_zD7RhnqyOqN0EJL75Aiy8vc-1xyW2rOnTRPwCTuyqe2HOSgKtr3Qafj9uZbGV9gDQDodEhS67hQC6fTg1-qNTKPyUmcmF2tuUJNMucl4gbNdy5U3lkTbzGSMpTDNuU7ZTdP7UoLnwTOuTrjw\")",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen7.jpg \"https://lh3.googleusercontent.com/aida/ADBb0uiiuwcKt9ZBDMzm6TgMd6e3WUWlUwZ7Otc9YETfL2cuX8mOuYzsApWMAvVKtRy7ZPukE7jD3Txzq-RyKpKLhENuDGP_qtM8MtAY2GzetcpH8dhpZZbJ8ik9Vgt9z98H9FWCYY370bBVDxoDVTkLhJ1wWCTm2XrgcioRgCkdV3hm-pQ6gyRdpe77vyEnLuVowf1o8I5Xu578SDSa7HEdKYXcv1T6lEhdD28bRbIQe-E8Ah2oYHBbiNIku1gVmQy04AzBA-efcVMQ7LU\")",
+      "Bash(curl -s -o /tmp/ecorun_screens/screen8.jpg \"https://lh3.googleusercontent.com/aida/ADBb0ujQw6Wj4dlofB1jc_gH_1DkNx4zxtGuQthuKyoK0OdFAmkN0dt7_eQtunL8HoNcsEDFwr5EN21v74IZQ_RickO-L87WD7jgHg8LNBd8bZFFIlx_2aPV_tf_vtfKkJ3dSxECJnK27l0JY7tWvEFqPP2WNGcYwom68r317IQ02Ijh3-iGtIfNdaN5yguC6azAtCrtxzB8Yxs03jCyv9qX4CNofUwPHWad8lQbc04wH0IME_qhGAQnT9RESldW-gJPePm2cU8XJ6EYPTo\")",
+      "Bash(flutter devices *)",
+      "Bash(flutter run *)",
+      "Bash(echo \"Flutter app launching in background, PID: $!\")",
+      "Bash(adb -s emulator-5554 shell screencap -p /sdcard/screen.png)",
+      "Bash(adb -s emulator-5554 pull /sdcard/screen.png \"C:\\\\Users\\\\KEIN\\\\AppData\\\\Local\\\\Temp\\\\screen1.png\")",
+      "PowerShell($env:PATH += \";$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\"; adb -s emulator-5554 shell screencap -p /sdcard/screen.png; adb -s emulator-5554 pull /sdcard/screen.png \"$env:TEMP\\\\screen1.png\")",
+      "PowerShell($env:PATH += \";$env:LOCALAPPDATA\\\\Android\\\\Sdk\\\\platform-tools\"; adb -s emulator-5554 shell wm size)",
+      "Bash(Get-Content \"C:\\\\Users\\\\KEIN\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\z--programming-SYU-EcoRun-ecoRunFrontend-ecorun\\\\83206392-dbb0-43bb-a607-b7d7e0c60ef8\\\\tasks\\\\bnipbz9b7.output\" -Wait)",
+      "Bash(Select-String --line-buffered \"Syncing|Installing|Running|Error|error|✓|√|flutter run\")",
+      "Bash(flutter pub *)",
+      "Bash(flutter analyze *)",
+      "WebFetch(domain:echorun-server-production.up.railway.app)",
+      "Bash(flutter clean *)",
+      "Bash(curl -s -I -L --max-redirs 5 \"https://echorun-server-production.up.railway.app/auth/google/login\")",
+      "Bash(curl -s -D - -L --max-redirs 5 \"https://echorun-server-production.up.railway.app/oauth2/authorization/google\")",
+      "Bash(keytool -list -v -keystore __TRACKED_VAR__/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android)",
+      "PowerShell(keytool -list -v -keystore \"$env:USERPROFILE\\\\.android\\\\debug.keystore\" -alias androiddebugkey -storepass android -keypass android 2>&1 | Select-String \"SHA1\")",
+      "PowerShell(& \"Z:\\\\Android\\\\AndroidStudio\\\\jbr\\\\bin\\\\keytool\" -list -v -keystore \"$env:USERPROFILE\\\\.android\\\\debug.keystore\" -alias androiddebugkey -storepass android -keypass android 2>&1 | Select-String \"SHA1\")",
+      "Bash(flutter build *)",
+      "Bash(Start-Sleep -Seconds 25)",
+      "Bash(Get-Content \"C:\\\\Users\\\\KEIN\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\z--programming-SYU-EcoRun-ecoRunFrontend-ecorun\\\\a7eb05e1-cfe6-497f-bdb5-87068fd6caea\\\\tasks\\\\bm8u2nb0a.output\")"
+    ]
+  }
+}

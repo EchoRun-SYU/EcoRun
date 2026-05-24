@@ -1,0 +1,16 @@
+{
+  "week": 3,
+  "type": "global",
+  "region": "전국",
+  "updatedAt": "2024-05-19T00:00:00Z",
+  "rankings": [
+    {"rank": 1, "userId": 10, "nickname": "김플론",   "levelName": "환경 수호자", "level": 4, "weeklyExp": 580, "isMe": false},
+    {"rank": 2, "userId": 11, "nickname": "최에코",   "levelName": "환경 러너",   "level": 3, "weeklyExp": 420, "isMe": false},
+    {"rank": 3, "userId": 12, "nickname": "박러너",   "levelName": "그린 러너",   "level": 2, "weeklyExp": 380, "isMe": false},
+    {"rank": 4, "userId": 13, "nickname": "이그린",   "levelName": "환경 러너",   "level": 3, "weeklyExp": 280, "isMe": false},
+    {"rank": 5, "userId": 14, "nickname": "정환경",   "levelName": "그린 러너",   "level": 2, "weeklyExp": 260, "isMe": false},
+    {"rank": 6, "userId": 15, "nickname": "강플로깅", "levelName": "환경 수호자", "level": 4, "weeklyExp": 220, "isMe": false},
+    {"rank": 7, "userId": 16, "nickname": "문에코",   "levelName": "그린 러너",   "level": 3, "weeklyExp": 190, "isMe": false},
+    {"rank": 12, "userId": 1, "nickname": "에코러너", "levelName": "그린 러너",   "level": 2, "weeklyExp": 180, "isMe": true}
+  ]
+}

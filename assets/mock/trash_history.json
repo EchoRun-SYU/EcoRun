@@ -1,0 +1,28 @@
+{
+  "history": [
+    {
+      "id": 1,
+      "runId": "run_001",
+      "trashType": "플라스틱병",
+      "count": 5,
+      "exp": 50,
+      "analyzedAt": "2024-05-15T08:45:00Z"
+    },
+    {
+      "id": 2,
+      "runId": "run_001",
+      "trashType": "담배초",
+      "count": 3,
+      "exp": 60,
+      "analyzedAt": "2024-05-15T08:55:00Z"
+    },
+    {
+      "id": 3,
+      "runId": "run_002",
+      "trashType": "캔",
+      "count": 2,
+      "exp": 30,
+      "analyzedAt": "2024-05-12T07:20:00Z"
+    }
+  ]
+}

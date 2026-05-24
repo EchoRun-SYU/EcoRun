@@ -1,0 +1,13 @@
+{
+  "userId": 1,
+  "totalRuns": 12,
+  "totalDistanceKm": 42.8,
+  "totalDurationSeconds": 18540,
+  "totalTrashCollected": 87,
+  "totalCalories": 1840,
+  "totalExp": 1240,
+  "monthlyRuns": 3,
+  "monthlyDistanceKm": 2.4,
+  "monthlyDurationSeconds": 2700,
+  "monthlyTrashCollected": 12
+}

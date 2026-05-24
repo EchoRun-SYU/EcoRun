@@ -1,0 +1,36 @@
+{
+  "badges": [
+    {
+      "id": "eco_starter",
+      "name": "에코 스타터",
+      "description": "첫 번째 플로깅 완료",
+      "iconKey": "eco",
+      "earnedAt": "2024-01-15T10:00:00Z",
+      "earned": true
+    },
+    {
+      "id": "first_plogging",
+      "name": "첫 플로깅",
+      "description": "플로깅 시작!",
+      "iconKey": "directions_run",
+      "earnedAt": "2024-01-15T10:00:00Z",
+      "earned": true
+    },
+    {
+      "id": "trash_king",
+      "name": "수거왕",
+      "description": "쓰레기 50개 수거",
+      "iconKey": "delete_outline",
+      "earnedAt": "2024-03-20T14:00:00Z",
+      "earned": true
+    },
+    {
+      "id": "top10",
+      "name": "TOP 10",
+      "description": "지역 랭킹 10위 진입",
+      "iconKey": "emoji_events",
+      "earnedAt": "2024-04-05T09:00:00Z",
+      "earned": true
+    }
+  ]
+}

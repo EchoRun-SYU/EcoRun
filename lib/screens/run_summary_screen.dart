@@ -1,0 +1,316 @@
+import 'package:flutter/material.dart';
+import '../app_theme.dart';
+import 'main_scaffold.dart';
+
+class RunSummaryScreen extends StatelessWidget {
+  final int seconds;
+  final double distance;
+  final int calories;
+  final int collected;
+  final int expGained;
+
+  const RunSummaryScreen({
+    super.key,
+    required this.seconds,
+    required this.distance,
+    required this.calories,
+    required this.collected,
+    required this.expGained,
+  });
+
+  String get _timeDisplay {
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    final s = seconds % 60;
+    return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+  String get _pace {
+    if (distance < 0.01) return "8'24\"";
+    final paceSeconds = (seconds / distance).round();
+    final pm = paceSeconds ~/ 60;
+    final ps = paceSeconds % 60;
+    return "$pm'${ps.toString().padLeft(2, '0')}\"";
+  }
+
+  String get _dateString {
+    final now = DateTime.now();
+    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    return '${now.month}월 ${now.day}일 ${weekdays[now.weekday - 1]}요일';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_rounded,
+              color: AppColors.onSurface),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const MainScaffold()),
+            (_) => false,
+          ),
+        ),
+        title: Column(
+          children: [
+            Text(_dateString, style: Theme.of(context).textTheme.bodyLarge),
+            Text('서초동 플로깅',
+                style: Theme.of(context).textTheme.labelMedium),
+          ],
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const MainScaffold()),
+              (_) => false,
+            ),
+            icon: const Icon(Icons.close_rounded, color: AppColors.onSurface),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Map with route
+          Expanded(
+            child: Container(
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withAlpha(8),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4))
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  children: [
+                    Container(color: const Color(0xFFE8F5E9)),
+                    CustomPaint(
+                      size: const Size(double.infinity, double.infinity),
+                      painter: _SummaryRoutePainter(),
+                    ),
+                    Positioned(
+                      top: 12,
+                      left: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryContainer,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text('EcoRun',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12)),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 12,
+                      left: 12,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.access_time_rounded,
+                              size: 14, color: AppColors.onSurfaceVariant),
+                          const SizedBox(width: 4),
+                          Text(_timeDisplay,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 12,
+                      right: 12,
+                      child: Text(
+                        '${distance.toStringAsFixed(2)} KM',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(color: AppColors.primary),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Stats row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLowest,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withAlpha(8),
+                      blurRadius: 16,
+                      offset: const Offset(0, 2))
+                ],
+              ),
+              child: Row(
+                children: [
+                  _stat(context, _pace, '평균 페이스'),
+                  _divider(),
+                  _stat(context, '$calories', '칼로리'),
+                  _divider(),
+                  _stat(context, '$collected', '수거 완료'),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // EXP gained banner
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.bolt_rounded,
+                      color: Colors.white, size: 22),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('플로깅 완료!',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14)),
+                  ),
+                  Text('+$expGained',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800)),
+                  const Text(' EXP',
+                      style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Action buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.share_rounded, size: 18),
+                  label: const Text('공유하기'),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MainScaffold()),
+                      (_) => false,
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side:
+                          const BorderSide(color: AppColors.outlineVariant),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: Text('플로깅 종료하기',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                                color: AppColors.onSurfaceVariant)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _stat(BuildContext context, String value, String label) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(value,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.w800, fontSize: 20)),
+          const SizedBox(height: 2),
+          Text(label,
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium
+                  ?.copyWith(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _divider() =>
+      Container(width: 1, height: 32, color: AppColors.outlineVariant);
+}
+
+class _SummaryRoutePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.primaryContainer
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path()
+      ..moveTo(size.width * 0.15, size.height * 0.75)
+      ..quadraticBezierTo(size.width * 0.3, size.height * 0.5,
+          size.width * 0.45, size.height * 0.35)
+      ..quadraticBezierTo(size.width * 0.6, size.height * 0.2,
+          size.width * 0.85, size.height * 0.25);
+
+    canvas.drawPath(path, paint);
+    canvas.drawCircle(
+      Offset(size.width * 0.15, size.height * 0.75),
+      7,
+      Paint()
+        ..color = AppColors.primary
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawCircle(Offset(size.width * 0.85, size.height * 0.25), 7,
+        Paint()..color = AppColors.primaryContainer);
+    canvas.drawCircle(Offset(size.width * 0.3, size.height * 0.55), 35,
+        Paint()..color = AppColors.primaryContainer.withAlpha(25));
+    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.3), 45,
+        Paint()..color = AppColors.primaryContainer.withAlpha(20));
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}

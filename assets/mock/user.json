@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "email": "runner@ecorun.app",
+  "nickname": "에코러너",
+  "profileImageUrl": null,
+  "region": "서울특별시 서초구 서초동",
+  "createdAt": "2024-01-15T09:00:00Z",
+  "token": "mock_token_ecorun_abc123"
+}

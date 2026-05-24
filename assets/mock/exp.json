@@ -1,0 +1,28 @@
+{
+  "userId": 1,
+  "totalExp": 1240,
+  "weeklyExp": 180,
+  "recentHistory": [
+    {
+      "id": 1,
+      "amount": 120,
+      "source": "run",
+      "description": "플로깅 완료 (3.2km)",
+      "earnedAt": "2024-05-15T09:15:00Z"
+    },
+    {
+      "id": 2,
+      "amount": 50,
+      "source": "trash",
+      "description": "쓰레기 수거 5개",
+      "earnedAt": "2024-05-15T08:45:00Z"
+    },
+    {
+      "id": 3,
+      "amount": 60,
+      "source": "trash",
+      "description": "쓰레기 수거 3개",
+      "earnedAt": "2024-05-15T08:55:00Z"
+    }
+  ]
+}

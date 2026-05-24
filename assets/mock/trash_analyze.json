@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "totalCount": 3,
+  "totalExp": 40,
+  "items": [
+    {
+      "id": "item_001",
+      "trashType": "플라스틱병",
+      "iconKey": "local_drink",
+      "count": 2,
+      "expEach": 10,
+      "totalExp": 20
+    },
+    {
+      "id": "item_002",
+      "trashType": "담배초",
+      "iconKey": "smoking_rooms",
+      "count": 1,
+      "expEach": 20,
+      "totalExp": 20
+    }
+  ]
+}
