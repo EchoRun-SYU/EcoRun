@@ -13,7 +13,7 @@ val localProps = Properties().apply {
 
 android {
     namespace = "com.example.ecorun"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

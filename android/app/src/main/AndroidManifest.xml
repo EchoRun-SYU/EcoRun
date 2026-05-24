@@ -40,7 +40,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!-- Disable Impeller on emulators: OpenGLES surface width=0 causes black screen -->
+        <!-- Impeller + OpenGLES on x86_64 emulators reports width=0 → black screen.
+             Remove this entry once the upstream Flutter bug is fixed. -->
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"
             android:value="false" />
