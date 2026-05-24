@@ -9,6 +9,7 @@ class RunModel {
   final int? expGained;
   final String status;
   final String region;
+  final String? routeJson;
 
   const RunModel({
     required this.id,
@@ -21,6 +22,7 @@ class RunModel {
     this.expGained,
     required this.status,
     this.region = '서초동',
+    this.routeJson,
   });
 
   // Mock JSON
@@ -55,5 +57,6 @@ class RunModel {
             json['expGained'] as int?,
         status: json['status'] as String? ?? 'completed',
         region: json['region'] as String? ?? '서초동',
+        routeJson: json['routeJson'] as String?,
       );
 }

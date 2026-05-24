@@ -142,6 +142,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
         _runId!,
         distance: _distance,
         duration: _seconds,
+        routePoints: _routePoints,
       );
     }
 

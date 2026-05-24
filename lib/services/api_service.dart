@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/user_model.dart';
@@ -123,9 +124,16 @@ class ApiService {
   }
 
   Future<void> endRun(int runId,
-      {required double distance, required int duration}) async {
-    await _post('/runs/$runId/end',
-        body: {'distance': distance, 'duration': duration});
+      {required double distance,
+      required int duration,
+      List<LatLng> routePoints = const []}) async {
+    await _post('/runs/$runId/end', body: {
+      'distance': distance,
+      'duration': duration,
+      'route': routePoints
+          .map((p) => {'lat': p.latitude, 'lng': p.longitude})
+          .toList(),
+    });
   }
 
   Future<List<RunModel>> getRuns() async {
