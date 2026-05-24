@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../app_theme.dart';
 import 'main_scaffold.dart';
 
@@ -8,6 +10,7 @@ class RunSummaryScreen extends StatelessWidget {
   final int calories;
   final int collected;
   final int expGained;
+  final List<LatLng> routePoints;
 
   const RunSummaryScreen({
     super.key,
@@ -16,6 +19,7 @@ class RunSummaryScreen extends StatelessWidget {
     required this.calories,
     required this.collected,
     required this.expGained,
+    this.routePoints = const [],
   });
 
   String get _timeDisplay {
@@ -31,6 +35,18 @@ class RunSummaryScreen extends StatelessWidget {
     final pm = paceSeconds ~/ 60;
     final ps = paceSeconds % 60;
     return "$pm'${ps.toString().padLeft(2, '0')}\"";
+  }
+
+  void _shareResult() {
+    final text = '🌱 EcoRun 플로깅 완료!\n'
+        '📅 $_dateString\n'
+        '⏱️ 시간: $_timeDisplay\n'
+        '🏃 거리: ${distance.toStringAsFixed(2)} km\n'
+        '🗑️ 수거: $collected 개\n'
+        '⚡ 획득 EXP: +$expGained\n'
+        '평균 페이스: $_pace\n\n'
+        '#EcoRun #플로깅 #환경보호';
+    Share.share(text);
   }
 
   String get _dateString {
@@ -58,7 +74,7 @@ class RunSummaryScreen extends StatelessWidget {
         title: Column(
           children: [
             Text(_dateString, style: Theme.of(context).textTheme.bodyLarge),
-            Text('서초동 플로깅',
+            Text('플로깅 완료',
                 style: Theme.of(context).textTheme.labelMedium),
           ],
         ),
@@ -76,7 +92,6 @@ class RunSummaryScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Map with route
           Expanded(
             child: Container(
               margin:
@@ -95,11 +110,7 @@ class RunSummaryScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 child: Stack(
                   children: [
-                    Container(color: const Color(0xFFE8F5E9)),
-                    CustomPaint(
-                      size: const Size(double.infinity, double.infinity),
-                      painter: _SummaryRoutePainter(),
-                    ),
+                    _buildSummaryMap(),
                     Positioned(
                       top: 12,
                       left: 12,
@@ -149,7 +160,6 @@ class RunSummaryScreen extends StatelessWidget {
               ),
             ),
           ),
-          // Stats row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
@@ -176,7 +186,6 @@ class RunSummaryScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // EXP gained banner
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
@@ -191,9 +200,9 @@ class RunSummaryScreen extends StatelessWidget {
                   const Icon(Icons.bolt_rounded,
                       color: Colors.white, size: 22),
                   const SizedBox(width: 8),
-                  Expanded(
+                  const Expanded(
                     child: Text('플로깅 완료!',
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 14)),
@@ -213,13 +222,12 @@ class RunSummaryScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          // Action buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: _shareResult,
                   icon: const Icon(Icons.share_rounded, size: 18),
                   label: const Text('공유하기'),
                 ),
@@ -255,6 +263,52 @@ class RunSummaryScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSummaryMap() {
+    final hasRoute = routePoints.isNotEmpty;
+    final center = hasRoute
+        ? routePoints[routePoints.length ~/ 2]
+        : const LatLng(37.5665, 126.9780);
+
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(target: center, zoom: 15),
+      zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
+      myLocationButtonEnabled: false,
+      scrollGesturesEnabled: false,
+      zoomGesturesEnabled: false,
+      rotateGesturesEnabled: false,
+      tiltGesturesEnabled: false,
+      polylines: hasRoute
+          ? {
+              Polyline(
+                polylineId: const PolylineId('summary_route'),
+                points: routePoints,
+                color: AppColors.primaryContainer,
+                width: 5,
+                startCap: Cap.roundCap,
+                endCap: Cap.roundCap,
+              ),
+            }
+          : {},
+      markers: hasRoute
+          ? {
+              Marker(
+                markerId: const MarkerId('start'),
+                position: routePoints.first,
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueGreen),
+              ),
+              Marker(
+                markerId: const MarkerId('end'),
+                position: routePoints.last,
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueRed),
+              ),
+            }
+          : {},
+    );
+  }
+
   Widget _stat(BuildContext context, String value, String label) {
     return Expanded(
       child: Column(
@@ -277,40 +331,4 @@ class RunSummaryScreen extends StatelessWidget {
 
   Widget _divider() =>
       Container(width: 1, height: 32, color: AppColors.outlineVariant);
-}
-
-class _SummaryRoutePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primaryContainer
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final path = Path()
-      ..moveTo(size.width * 0.15, size.height * 0.75)
-      ..quadraticBezierTo(size.width * 0.3, size.height * 0.5,
-          size.width * 0.45, size.height * 0.35)
-      ..quadraticBezierTo(size.width * 0.6, size.height * 0.2,
-          size.width * 0.85, size.height * 0.25);
-
-    canvas.drawPath(path, paint);
-    canvas.drawCircle(
-      Offset(size.width * 0.15, size.height * 0.75),
-      7,
-      Paint()
-        ..color = AppColors.primary
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawCircle(Offset(size.width * 0.85, size.height * 0.25), 7,
-        Paint()..color = AppColors.primaryContainer);
-    canvas.drawCircle(Offset(size.width * 0.3, size.height * 0.55), 35,
-        Paint()..color = AppColors.primaryContainer.withAlpha(25));
-    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.3), 45,
-        Paint()..color = AppColors.primaryContainer.withAlpha(20));
-  }
-
-  @override
-  bool shouldRepaint(_) => false;
 }

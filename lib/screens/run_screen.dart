@@ -1,10 +1,43 @@
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
+import '../models/run_model.dart';
+import '../services/api_service.dart';
 import '../state/app_state.dart';
 import 'active_run_screen.dart';
+import 'settings_screen.dart';
 
-class RunScreen extends StatelessWidget {
+class RunScreen extends StatefulWidget {
   const RunScreen({super.key});
+
+  @override
+  State<RunScreen> createState() => _RunScreenState();
+}
+
+class _RunScreenState extends State<RunScreen> {
+  static const int _dailyGoalCount = 3;
+  int _todayCompletedRuns = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTodayRuns();
+  }
+
+  Future<void> _loadTodayRuns() async {
+    try {
+      final runs = await ApiService.instance.getRuns();
+      final now = DateTime.now();
+      final count = runs.where((RunModel r) {
+        final dt = DateTime.tryParse(r.startedAt);
+        return dt != null &&
+            dt.year == now.year &&
+            dt.month == now.month &&
+            dt.day == now.day &&
+            r.status == 'completed';
+      }).length;
+      if (mounted) setState(() => _todayCompletedRuns = count);
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +46,6 @@ class RunScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // App bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
@@ -24,13 +56,15 @@ class RunScreen extends StatelessWidget {
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                    ),
                     icon: const Icon(Icons.settings_outlined, color: AppColors.onSurfaceVariant),
                   ),
                 ],
               ),
             ),
-            // User info bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
@@ -83,7 +117,7 @@ class RunScreen extends StatelessWidget {
                           const Icon(Icons.bolt_rounded, color: AppColors.primaryContainer, size: 16),
                           Text(
                             ' ${AppState.instance.userLevel?.currentExp ?? 0} EXP',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: AppColors.primaryContainer,
@@ -96,12 +130,10 @@ class RunScreen extends StatelessWidget {
                 ),
               ),
             ),
-            // START button area
             Expanded(
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Decorative leaf icons
                   Positioned(
                     top: 30,
                     left: 40,
@@ -112,7 +144,6 @@ class RunScreen extends StatelessWidget {
                     right: 60,
                     child: Icon(Icons.eco_rounded, color: AppColors.primaryContainer.withAlpha(40), size: 20),
                   ),
-                  // Glow ring
                   Container(
                     width: 200,
                     height: 200,
@@ -129,14 +160,11 @@ class RunScreen extends StatelessWidget {
                       color: AppColors.primaryContainer.withAlpha(30),
                     ),
                   ),
-                  // START button
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ActiveRunScreen()),
-                      );
-                    },
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ActiveRunScreen()),
+                    ).then((_) => _loadTodayRuns()),
                     child: Container(
                       width: 130,
                       height: 130,
@@ -186,7 +214,6 @@ class RunScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            // Today's goal
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
@@ -230,9 +257,11 @@ class RunScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '0 / 3',
+                      '$_todayCompletedRuns / $_dailyGoalCount',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.primaryContainer,
+                        color: _todayCompletedRuns >= _dailyGoalCount
+                            ? AppColors.primaryContainer
+                            : AppColors.onSurfaceVariant,
                       ),
                     ),
                   ],

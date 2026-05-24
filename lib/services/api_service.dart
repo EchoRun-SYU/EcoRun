@@ -66,7 +66,7 @@ class ApiService {
       {String? nickname}) async {
     return _post('/auth/google/token', body: {
       'idToken': idToken,
-      if (nickname != null) 'nickname': nickname,
+      'nickname': ?nickname,
     });
   }
 
@@ -85,9 +85,35 @@ class ApiService {
   }
 
   Future<StatsModel> getMyStats() async {
-    final data = await _get('/users/me/stats',
-        params: {'userId': '${AppState.instance.userId}'});
-    return StatsModel.fromApiJson(data);
+    final userId = AppState.instance.userId;
+    final results = await Future.wait([
+      _get('/users/me/stats', params: {'userId': '$userId'}),
+      _getList('/runs', params: {'userId': '$userId'}),
+    ]);
+
+    final statsData = results[0] as Map<String, dynamic>;
+    final runsList = (results[1] as List).cast<Map<String, dynamic>>();
+
+    final now = DateTime.now();
+    final monthlyRuns = runsList.where((r) {
+      final raw = r['startTime'] as String? ?? r['startedAt'] as String? ?? '';
+      final dt = DateTime.tryParse(raw);
+      return dt != null &&
+          dt.year == now.year &&
+          dt.month == now.month &&
+          (r['status'] as String? ?? '') == 'completed';
+    }).toList();
+
+    return StatsModel.fromApiJson(
+      statsData,
+      monthlyRuns: monthlyRuns.length,
+      monthlyDistanceKm: monthlyRuns.fold(
+          0.0, (s, r) => s + ((r['distance'] as num?)?.toDouble() ?? 0)),
+      monthlyDurationSeconds: monthlyRuns.fold(
+          0, (s, r) => s + ((r['duration'] as num?)?.toInt() ?? 0)),
+      monthlyTrashCollected: monthlyRuns.fold(
+          0, (s, r) => s + ((r['trashCount'] as num?)?.toInt() ?? 0)),
+    );
   }
 
   // ── runs ───────────────────────────────────────────────────
@@ -185,10 +211,7 @@ class ApiService {
         globalRank: (globalEntry?['rank'] as num?)?.toInt() ?? 0,
         regionRank: (regionEntry?['rank'] as num?)?.toInt() ?? 0,
         region: region,
-        weeklyExp:
-            (((globalEntry?['totalDistance'] as num?)?.toDouble() ?? 0) *
-                    10)
-                .round(),
+        weeklyExp: (globalEntry?['exp'] as num?)?.toInt() ?? 0,
       );
     } catch (_) {
       return MyRankingModel(

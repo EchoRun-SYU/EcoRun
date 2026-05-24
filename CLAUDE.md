@@ -8,21 +8,31 @@
 
 ```
 lib/
-  main.dart                      # 앱 진입점 → LoginScreen
+  main.dart                      # 앱 진입점 → 세션 복원 → LoginScreen / MainScaffold
   app_theme.dart                 # 컬러/타이포그래피 디자인 시스템
   screens/
-    login_screen.dart            # 로그인 (이메일 + 소셜: 카카오/네이버/구글)
+    login_screen.dart            # 로그인 (구글 OAuth — 카카오/네이버 준비중)
     register_screen.dart         # 회원가입
+    nickname_setup_screen.dart   # 신규 유저 닉네임 설정
     main_scaffold.dart           # 바텀 네비 컨트롤러 (홈/러닝/랭킹/프로필)
-    home_screen.dart             # 홈 대시보드
+    home_screen.dart             # 홈 대시보드 (통계/레벨/랭킹 미리보기)
     run_screen.dart              # 플로깅 시작 화면 (START 버튼)
-    active_run_screen.dart       # 활성 런 + 일시정지 상태
-    trash_collect_screen.dart    # 수거 인증 (카메라/갤러리 선택)
+    active_run_screen.dart       # 활성 런 + 일시정지 상태 (GPS + 지도)
+    trash_collect_screen.dart    # 수거 인증 (카메라/갤러리 → AI 분석)
     trash_result_screen.dart     # 수거 인증 결과 (+EXP 표시)
-    run_summary_screen.dart      # 플로깅 완료 요약
+    run_summary_screen.dart      # 플로깅 완료 요약 (경로 지도 포함)
     ranking_screen.dart          # 랭킹 (LOCAL / CITY 탭)
     profile_screen.dart          # 내 프로필 (레벨, 통계, 뱃지)
     settings_screen.dart         # 설정 (권한, 자동일시중지, 음성피드백)
+  services/
+    api_service.dart             # 백엔드 REST API 클라이언트 (싱글톤)
+    gps_service.dart             # GPS 스트림 · 거리 누적 서비스
+  state/
+    app_state.dart               # 전역 상태 (로그인 토큰, 유저, 레벨)
+  models/
+    user_model.dart / level_model.dart / stats_model.dart
+    run_model.dart / ranking_model.dart
+    trash_model.dart / badge_model.dart / exp_model.dart
 ```
 
 ## 의존성 (`pubspec.yaml`)
@@ -32,13 +42,27 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
+  image_picker: ^1.1.2
+  google_sign_in: ^6.2.1
+  geolocator: ^12.0.0
+  google_maps_flutter: ^2.9.0
 ```
 
-## 추후 연동이 필요한 기능 (미구현)
-- [ ] 실제 GPS → `geolocator` / 지도 → `google_maps_flutter`
-- [ ] AI 쓰레기 인식 → `image_picker` + 백엔드 API
-- [ ] 백엔드 API 연동 (로그인/회원가입/랭킹/EXP)
-- [ ] 실제 BPM 센서 / 푸시 알림
+## 구현 현황
+
+### 완료 ✅
+- [x] 실제 GPS → `geolocator` (`GpsService` — 거리 누적, 일시정지/재개)
+- [x] 지도 → `google_maps_flutter` (활성 런 경로 실시간 표시, 요약 화면 경로 뷰)
+- [x] AI 쓰레기 인식 → `image_picker` + 백엔드 `/trash/analyze` API
+- [x] 백엔드 API 연동 — 구글 OAuth 로그인, 유저/레벨/통계, 런 시작·종료, 쓰레기 등록, EXP, 랭킹
+
+### 미구현 🔲
+- [ ] 푸시 알림 (FCM) — 플로깅 완료 알림, 주간 랭킹 변동, 활동 리마인더
+- [ ] BPM 센서 — 현재 '--' 표시 (카메라 PPG 또는 블루투스 심박계 연동)
+- [ ] 뱃지 시스템 — UI 존재하나 badges=[] 빈 상태, 백엔드 /badges API 연동 필요
+- [ ] 카카오 / 네이버 로그인 (현재 '준비중' 비활성)
 
 ---
 
@@ -96,4 +120,12 @@ classes — 클래스
 높은 응집도를 유지한다
 메서드가 클래스 변수 대부분을 사용해야 함. 변수를 조금만 쓰는 메서드는 분리 후보.
 변경에 닫히고 확장에 열린다 (OCP)
-기존 코드를 수정하지 않고 새 기능을 추가할 수 있는 구조를 지향.
+기존 코드를 수정하지 않고 새 기능을 추가할 수 있는 구조를 지향
+
+
+## 개발 흐름의 규칙
+1. 개발 예정 내용은 Schedule.md 파일에 작성해둘것
+2. 개발 완료 후 빌드 / 작동 테스트를 진행할것
+3. 기능에 문제가 있을경우 디버깅 및 수정 작업을 거칠 것.
+4. 개발 완료 후 git내역 커밋할것
+**필요할 경우 ecorunBackend 에 있는 Backend 와 비교분석및 교차개발할것"

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_settings/app_settings.dart';
 import '../app_theme.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -9,9 +11,34 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  static const _keyAutoPause = 'settings_auto_pause';
+  static const _keyVoiceFeedback = 'settings_voice_feedback';
+  static const _keyScreenLock = 'settings_screen_lock';
+
   bool _autoPause = true;
   bool _voiceFeedback = true;
   bool _screenLock = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _autoPause = prefs.getBool(_keyAutoPause) ?? true;
+      _voiceFeedback = prefs.getBool(_keyVoiceFeedback) ?? true;
+      _screenLock = prefs.getBool(_keyScreenLock) ?? false;
+    });
+  }
+
+  Future<void> _saveSetting(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +75,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               '자동 일시 중지',
               '정지 감지 시 러닝 자동 대기',
               _autoPause,
-              (v) => setState(() => _autoPause = v),
+              (v) {
+                setState(() => _autoPause = v);
+                _saveSetting(_keyAutoPause, v);
+              },
             ),
             _toggleItem(
               context,
@@ -57,7 +87,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               '음성 피드백',
               '러닝 진행 상황 음성 안내',
               _voiceFeedback,
-              (v) => setState(() => _voiceFeedback = v),
+              (v) {
+                setState(() => _voiceFeedback = v);
+                _saveSetting(_keyVoiceFeedback, v);
+              },
             ),
             _toggleItem(
               context,
@@ -66,7 +99,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               '화면 잠금',
               '러닝 중 화면 잠금 방지',
               _screenLock,
-              (v) => setState(() => _screenLock = v),
+              (v) {
+                setState(() => _screenLock = v);
+                _saveSetting(_keyScreenLock, v);
+              },
             ),
             const SizedBox(height: 40),
             Center(
@@ -108,7 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text(title, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
         subtitle: Text(subtitle, style: Theme.of(context).textTheme.labelMedium?.copyWith(fontSize: 12)),
         trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.outline),
-        onTap: () {},
+        onTap: () => AppSettings.openAppSettings(),
       ),
     );
   }

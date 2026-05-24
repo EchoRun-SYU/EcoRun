@@ -6,7 +6,6 @@ import '../services/api_service.dart';
 import '../state/app_state.dart';
 import 'main_scaffold.dart';
 import 'nickname_setup_screen.dart';
-import 'register_screen.dart';
 
 final _googleSignIn = GoogleSignIn(
   serverClientId:
@@ -136,41 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        '계정이 없으신가요?',
-                        style: TextStyle(
-                          color: AppColors.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const RegisterScreen()),
-                        ),
-                        child: const Text(
-                          '회원가입',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    '소셜 로그인',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
                   _socialButton(
                     color: AppColors.surfaceLowest,
                     textColor: AppColors.onSurface,
@@ -178,23 +143,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     label: '구글로 로그인',
                     hasBorder: true,
                     onTap: _signInWithGoogle,
-                  ),
-                  const SizedBox(height: 10),
-                  _socialButton(
-                    color: const Color(0xFFFEE500),
-                    textColor: const Color(0xFF191919),
-                    icon: '💬',
-                    label: '카카오로 로그인 (준비중)',
-                    onTap: null,
-                  ),
-                  const SizedBox(height: 10),
-                  _socialButton(
-                    color: const Color(0xFF03C75A),
-                    textColor: Colors.white,
-                    icon: 'N',
-                    label: '네이버로 로그인 (준비중)',
-                    isText: true,
-                    onTap: null,
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -219,51 +167,46 @@ class _LoginScreenState extends State<LoginScreen> {
     required Color textColor,
     required String icon,
     required String label,
-    bool isText = false,
     bool hasBorder = false,
-    VoidCallback? onTap,
+    required VoidCallback onTap,
   }) {
-    final disabled = onTap == null;
     return SizedBox(
       width: double.infinity,
       height: 52,
-      child: Opacity(
-        opacity: disabled ? 0.45 : 1.0,
-        child: Material(
-          color: color,
-          shape: hasBorder
-              ? RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                  side: const BorderSide(color: AppColors.outlineVariant),
-                )
-              : RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
+      child: Material(
+        color: color,
+        shape: hasBorder
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(999),
+                side: const BorderSide(color: AppColors.outlineVariant),
+              )
+            : RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(999),
+              ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: _loading ? null : onTap,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                icon,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: textColor,
                 ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(999),
-            onTap: disabled || _loading ? null : onTap,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  icon,
-                  style: TextStyle(
-                    fontSize: isText ? 16 : 18,
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                  ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -45,10 +45,17 @@ class BadgeModel {
 
   Color get badgeColor {
     switch (id) {
+      case 'first_run':
+        return const Color(0xFF4CAF50);
+      case '5k_runner':
+        return const Color(0xFF2196F3);
+      case 'trash_king':
+        return const Color(0xFFFF9800);
+      case 'regular':
+        return const Color(0xFF9C27B0);
+      case '10k_runner':
       case 'top10':
         return const Color(0xFFFFD700);
-      case 'trash_king':
-        return const Color(0xFF4CAF50);
       default:
         return const Color(0xFF2E7D32);
     }

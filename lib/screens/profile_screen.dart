@@ -46,9 +46,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _stats = stats;
       _level = level;
-      _badges = [];
+      _badges = _computeBadges(stats);
       _loading = false;
     });
+  }
+
+  List<BadgeModel> _computeBadges(StatsModel stats) {
+    final earned = <BadgeModel>[];
+    if (stats.totalRuns >= 1) {
+      earned.add(const BadgeModel(
+        id: 'first_run', name: '첫 걸음',
+        description: '첫 번째 플로깅 완료', iconKey: 'eco', earned: true,
+      ));
+    }
+    if (stats.totalDistanceKm >= 5.0) {
+      earned.add(const BadgeModel(
+        id: '5k_runner', name: '5K 러너',
+        description: '누적 5km 달성', iconKey: 'directions_run', earned: true,
+      ));
+    }
+    if (stats.totalTrashCollected >= 10) {
+      earned.add(const BadgeModel(
+        id: 'trash_king', name: '쓰레기 전사',
+        description: '쓰레기 10개 수거', iconKey: 'delete_outline', earned: true,
+      ));
+    }
+    if (stats.totalRuns >= 5) {
+      earned.add(const BadgeModel(
+        id: 'regular', name: '꾸준한 러너',
+        description: '5회 플로깅 완료', iconKey: 'emoji_events', earned: true,
+      ));
+    }
+    if (stats.totalDistanceKm >= 10.0) {
+      earned.add(const BadgeModel(
+        id: '10k_runner', name: '10K 러너',
+        description: '누적 10km 달성', iconKey: 'star', earned: true,
+      ));
+    }
+    return earned;
   }
 
   @override

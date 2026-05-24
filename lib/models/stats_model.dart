@@ -55,7 +55,15 @@ class StatsModel {
       );
 
   // Real API: GET /users/me/stats → {totalDistance, plogCount, totalExp, level}
-  factory StatsModel.fromApiJson(Map<String, dynamic> json) => StatsModel(
+  // Monthly fields are not provided by backend — pass them from the caller.
+  factory StatsModel.fromApiJson(
+    Map<String, dynamic> json, {
+    int monthlyRuns = 0,
+    double monthlyDistanceKm = 0.0,
+    int monthlyDurationSeconds = 0,
+    int monthlyTrashCollected = 0,
+  }) =>
+      StatsModel(
         userId: (json['userId'] as num?)?.toInt() ?? 0,
         totalRuns: (json['plogCount'] as num?)?.toInt() ??
             json['totalRuns'] as int? ?? 0,
@@ -68,16 +76,10 @@ class StatsModel {
             (json['totalTrashCollected'] as num?)?.toInt() ?? 0,
         totalCalories: (json['totalCalories'] as num?)?.toInt() ?? 0,
         totalExp: (json['totalExp'] as num?)?.toInt() ?? 0,
-        monthlyRuns:
-            (json['monthlyRuns'] as num?)?.toInt() ??
-                (json['plogCount'] as num?)?.toInt() ?? 0,
-        monthlyDistanceKm:
-            (json['monthlyDistanceKm'] as num?)?.toDouble() ??
-                (json['totalDistance'] as num?)?.toDouble() ?? 0.0,
-        monthlyDurationSeconds:
-            (json['monthlyDurationSeconds'] as num?)?.toInt() ?? 0,
-        monthlyTrashCollected:
-            (json['monthlyTrashCollected'] as num?)?.toInt() ?? 0,
+        monthlyRuns: monthlyRuns,
+        monthlyDistanceKm: monthlyDistanceKm,
+        monthlyDurationSeconds: monthlyDurationSeconds,
+        monthlyTrashCollected: monthlyTrashCollected,
       );
 
   String get monthlyDurationFormatted {

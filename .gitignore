@@ -1,3 +1,7 @@
+# Secrets — never commit real keys
+.env
+ios/Runner/LocalConfig.swift
+
 # Miscellaneous
 *.class
 *.log

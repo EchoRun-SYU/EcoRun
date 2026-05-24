@@ -1,0 +1,5 @@
+// 이 파일을 복사해서 LocalConfig.swift 로 이름 변경 후 실제 키를 입력하세요.
+// cp ios/Runner/LocalConfig.swift.example ios/Runner/LocalConfig.swift
+struct LocalConfig {
+    static let googleMapsAPIKey = "YOUR_GOOGLE_MAPS_API_KEY"
+}

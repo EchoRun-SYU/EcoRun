@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../app_theme.dart';
 import '../services/api_service.dart';
 import '../services/gps_service.dart';
@@ -19,6 +19,7 @@ class ActiveRunScreen extends StatefulWidget {
 class _ActiveRunScreenState extends State<ActiveRunScreen> {
   final _gpsService = GpsService();
   StreamSubscription<double>? _distanceSubscription;
+  StreamSubscription<Position>? _positionSubscription;
 
   Timer? _timer;
   int _seconds = 0;
@@ -29,7 +30,11 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
   bool _stopping = false;
   bool _gpsActive = false;
   int? _runId;
-  List<Position> _routePositions = [];
+
+  // 지도 관련
+  GoogleMapController? _mapController;
+  final List<LatLng> _routePoints = [];
+  LatLng? _currentPosition;
 
   @override
   void initState() {
@@ -60,16 +65,23 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
     }
 
     _distanceSubscription = _gpsService.distanceStream.listen((distance) {
-      if (mounted) {
-        setState(() {
-          _distance = distance;
-          _routePositions = List.from(_gpsService.positionHistory);
-        });
-      }
+      if (mounted) setState(() => _distance = distance);
     });
+
+    _positionSubscription = _gpsService.positionStream.listen(_onPosition);
 
     setState(() => _gpsActive = true);
     _gpsService.start();
+  }
+
+  void _onPosition(Position position) {
+    if (!mounted) return;
+    final latLng = LatLng(position.latitude, position.longitude);
+    setState(() {
+      _currentPosition = latLng;
+      _routePoints.add(latLng);
+    });
+    _mapController?.animateCamera(CameraUpdate.newLatLng(latLng));
   }
 
   void _startTimer() {
@@ -88,6 +100,8 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
   void dispose() {
     _timer?.cancel();
     _distanceSubscription?.cancel();
+    _positionSubscription?.cancel();
+    _mapController?.dispose();
     _gpsService.dispose();
     super.dispose();
   }
@@ -143,6 +157,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
           calories: _calories,
           collected: _collected,
           expGained: expGained,
+          routePoints: _routePoints,
         ),
       ),
     );
@@ -258,15 +273,7 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  Container(
-                    color: AppColors.surfaceContainerLow,
-                    child: Center(
-                      child: CustomPaint(
-                        size: const Size(300, 200),
-                        painter: _RoutePainter(_routePositions),
-                      ),
-                    ),
-                  ),
+                  _buildRouteMap(),
                   Positioned(
                     top: 12,
                     left: 12,
@@ -337,6 +344,47 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
     );
   }
 
+  Widget _buildRouteMap() {
+    final hasRoute = _routePoints.isNotEmpty;
+    final initialTarget = _currentPosition ??
+        (_routePoints.isNotEmpty ? _routePoints.last : const LatLng(37.5665, 126.9780));
+
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: initialTarget,
+        zoom: 16,
+      ),
+      onMapCreated: (controller) => _mapController = controller,
+      myLocationEnabled: _gpsActive,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
+      polylines: hasRoute
+          ? {
+              Polyline(
+                polylineId: const PolylineId('route'),
+                points: _routePoints,
+                color: AppColors.primaryContainer,
+                width: 5,
+                startCap: Cap.roundCap,
+                endCap: Cap.roundCap,
+              ),
+            }
+          : {},
+      markers: hasRoute
+          ? {
+              Marker(
+                markerId: const MarkerId('start'),
+                position: _routePoints.first,
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueGreen),
+                infoWindow: const InfoWindow(title: '출발'),
+              ),
+            }
+          : {},
+    );
+  }
+
   Widget _topStat(String value, String label) {
     return Expanded(
       child: Column(
@@ -394,90 +442,4 @@ class _ActiveRunScreenState extends State<ActiveRunScreen> {
       ),
     );
   }
-}
-
-class _RoutePainter extends CustomPainter {
-  final List<Position> positions;
-
-  const _RoutePainter(this.positions);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (positions.length < 2) {
-      _drawWaiting(canvas, size);
-      return;
-    }
-
-    double minLat = positions.first.latitude;
-    double maxLat = positions.first.latitude;
-    double minLng = positions.first.longitude;
-    double maxLng = positions.first.longitude;
-
-    for (final p in positions) {
-      minLat = min(minLat, p.latitude);
-      maxLat = max(maxLat, p.latitude);
-      minLng = min(minLng, p.longitude);
-      maxLng = max(maxLng, p.longitude);
-    }
-
-    final latRange = maxLat - minLat;
-    final lngRange = maxLng - minLng;
-
-    if (latRange < 1e-8 && lngRange < 1e-8) {
-      _drawWaiting(canvas, size);
-      return;
-    }
-
-    const padding = 24.0;
-    final drawWidth = size.width - padding * 2;
-    final drawHeight = size.height - padding * 2;
-
-    Offset project(Position p) {
-      final x = lngRange < 1e-8
-          ? size.width / 2
-          : padding + (p.longitude - minLng) / lngRange * drawWidth;
-      final y = latRange < 1e-8
-          ? size.height / 2
-          : padding + (maxLat - p.latitude) / latRange * drawHeight;
-      return Offset(x, y);
-    }
-
-    final linePaint = Paint()
-      ..color = AppColors.primaryContainer
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path();
-    final first = project(positions.first);
-    path.moveTo(first.dx, first.dy);
-    for (var i = 1; i < positions.length; i++) {
-      final pt = project(positions[i]);
-      path.lineTo(pt.dx, pt.dy);
-    }
-    canvas.drawPath(path, linePaint);
-
-    canvas.drawCircle(
-        project(positions.first), 6, Paint()..color = AppColors.primary);
-    canvas.drawCircle(
-        project(positions.last), 6, Paint()..color = AppColors.primaryContainer);
-  }
-
-  void _drawWaiting(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    canvas.drawCircle(
-      center,
-      20,
-      Paint()
-        ..color = AppColors.primaryContainer.withAlpha(60)
-        ..strokeWidth = 2
-        ..style = PaintingStyle.stroke,
-    );
-    canvas.drawCircle(center, 5, Paint()..color = AppColors.primaryContainer);
-  }
-
-  @override
-  bool shouldRepaint(_RoutePainter old) =>
-      old.positions.length != positions.length;
 }

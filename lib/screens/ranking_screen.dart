@@ -218,7 +218,7 @@ class _RankingScreenState extends State<RankingScreen>
                       Text('LEADERBOARD',
                           style: Theme.of(context).textTheme.bodyLarge),
                       const Spacer(),
-                      Text('WEEKLY EXP',
+                      Text('EXP',
                           style: Theme.of(context).textTheme.labelMedium),
                     ],
                   ),

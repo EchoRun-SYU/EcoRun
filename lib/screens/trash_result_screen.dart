@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../app_theme.dart';
 import '../models/trash_model.dart';
 import '../services/api_service.dart';
@@ -19,6 +20,23 @@ class TrashResultScreen extends StatefulWidget {
 
 class _TrashResultScreenState extends State<TrashResultScreen> {
   bool _saving = false;
+  bool _autoPause = true;
+  bool _voiceFeedback = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _autoPause = prefs.getBool('settings_auto_pause') ?? true;
+      _voiceFeedback = prefs.getBool('settings_voice_feedback') ?? true;
+    });
+  }
 
   Future<void> _continueRun() async {
     if (_saving) return;
@@ -130,10 +148,10 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
                       '러닝 위치 공유', true),
                   const SizedBox(height: 8),
                   _settingRow(context, Icons.pause_circle_outline_rounded,
-                      '자동 일시 중지', true),
+                      '자동 일시 중지', _autoPause),
                   const SizedBox(height: 8),
                   _settingRow(
-                      context, Icons.volume_up_outlined, '음성 피드백', true),
+                      context, Icons.volume_up_outlined, '음성 피드백', _voiceFeedback),
                 ],
               ),
             ),
