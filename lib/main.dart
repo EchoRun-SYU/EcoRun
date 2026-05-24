@@ -35,12 +35,14 @@ class _StartupScreenState extends State<_StartupScreen> {
   @override
   void initState() {
     super.initState();
-    _restoreSession();
+    // 첫 프레임이 렌더링된 후에 세션 복원을 시작해야 검은 화면 방지
+    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreSession());
   }
 
   Future<void> _restoreSession() async {
     final hasSession = await AppState.instance.restoreSession();
-    if (!hasSession || !mounted) {
+    if (!mounted) return;
+    if (!hasSession) {
       _navigate(const LoginScreen());
       return;
     }

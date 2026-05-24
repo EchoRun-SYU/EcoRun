@@ -102,7 +102,7 @@ class ApiService {
       return dt != null &&
           dt.year == now.year &&
           dt.month == now.month &&
-          (r['status'] as String? ?? '') == 'completed';
+          (r['isCompleted'] as bool? ?? false);
     }).toList();
 
     return StatsModel.fromApiJson(
@@ -191,7 +191,8 @@ class ApiService {
   }
 
   Future<RankingListModel> getRegionRanking() async {
-    final region = AppState.instance.currentUser?.region ?? '';
+    final rawRegion = AppState.instance.currentUser?.region ?? '';
+    final region = rawRegion.isNotEmpty ? rawRegion : 'SEOUL';
     final list = await _getList('/rankings/region',
         params: {'region': region});
     return _buildRankingModel(list, 'region', region);
@@ -200,11 +201,10 @@ class ApiService {
   Future<MyRankingModel> getMyRanking() async {
     try {
       final myId = AppState.instance.userId;
-      final region = AppState.instance.currentUser?.region ?? '';
+      final rawRegion = AppState.instance.currentUser?.region ?? '';
+      final region = rawRegion.isNotEmpty ? rawRegion : 'SEOUL';
       final globalList = await _getList('/rankings/global');
-      final regionList = region.isNotEmpty
-          ? await _getList('/rankings/region', params: {'region': region})
-          : <dynamic>[];
+      final regionList = await _getList('/rankings/region', params: {'region': region});
 
       final globalEntry = globalList
           .cast<Map<String, dynamic>>()

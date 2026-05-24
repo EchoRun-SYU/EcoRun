@@ -31,15 +31,11 @@ class _RankingScreenState extends State<RankingScreen>
     RankingListModel region = RankingListModel.empty();
     MyRankingModel me = MyRankingModel(globalRank: 0, regionRank: 0, region: '', weeklyExp: 0);
 
-    try {
-      await Future.wait([
-        api.getGlobalRanking().then((v) => global = v),
-        api.getRegionRanking().then((v) => region = v),
-        api.getMyRanking().then((v) => me = v),
-      ]);
-    } catch (e) {
-      debugPrint('RankingScreen 데이터 로드 실패: $e');
-    }
+    await Future.wait([
+      _safeFetch(api.getGlobalRanking(), (v) => global = v),
+      _safeFetch(api.getRegionRanking(), (v) => region = v),
+      _safeFetch(api.getMyRanking(), (v) => me = v),
+    ]);
 
     if (!mounted) return;
     setState(() {
@@ -48,6 +44,14 @@ class _RankingScreenState extends State<RankingScreen>
       _myRanking = me;
       _loading = false;
     });
+  }
+
+  Future<void> _safeFetch<T>(Future<T> future, void Function(T) assign) async {
+    try {
+      assign(await future);
+    } catch (e) {
+      debugPrint('랭킹 데이터 로드 실패: $e');
+    }
   }
 
   @override
