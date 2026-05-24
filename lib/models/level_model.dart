@@ -34,17 +34,26 @@ class LevelModel {
         prevLevelExp: json['prevLevelExp'] as int,
       );
 
+  // 백엔드 레벨 임계값 미러 (UserLevelResponse.java getNextLevelExp 기준)
+  static const List<int> _levelThresholds = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200];
+
   // Real API: GET /users/me/level → {level, levelTitle, currentExp, nextLevelExp}
-  factory LevelModel.fromApiJson(Map<String, dynamic> json) => LevelModel(
-        userId: (json['userId'] as num?)?.toInt() ?? 0,
-        currentLevel: (json['level'] as num?)?.toInt() ??
-            json['currentLevel'] as int? ?? 1,
-        levelName: json['levelTitle'] as String? ??
-            json['levelName'] as String? ?? '',
-        currentExp: (json['currentExp'] as num?)?.toInt() ?? 0,
-        nextLevelExp: (json['nextLevelExp'] as num?)?.toInt() ?? 1,
-        prevLevelExp: (json['prevLevelExp'] as num?)?.toInt() ?? 0,
-      );
+  factory LevelModel.fromApiJson(Map<String, dynamic> json) {
+    final level = (json['level'] as num?)?.toInt() ??
+        (json['currentLevel'] as num?)?.toInt() ?? 1;
+    final prevExp = (level - 1) < _levelThresholds.length
+        ? _levelThresholds[(level - 1).clamp(0, _levelThresholds.length - 1)]
+        : _levelThresholds.last;
+    return LevelModel(
+      userId: (json['userId'] as num?)?.toInt() ?? 0,
+      currentLevel: level,
+      levelName: json['levelTitle'] as String? ??
+          json['levelName'] as String? ?? '',
+      currentExp: (json['currentExp'] as num?)?.toInt() ?? 0,
+      nextLevelExp: (json['nextLevelExp'] as num?)?.toInt() ?? 1,
+      prevLevelExp: prevExp,
+    );
+  }
 
   double get progress {
     final range = nextLevelExp - prevLevelExp;

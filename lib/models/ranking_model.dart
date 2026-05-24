@@ -30,14 +30,15 @@ class RankingEntry {
         isMe: json['isMe'] as bool? ?? false,
       );
 
-  // Real API: GET /rankings/* → {rank, userId, nickname, region, level, exp, totalDistance, plogCount}
+  // Real API: GET /rankings/* → {rank, userId, nickname, region, level, levelTitle, exp, totalDistance, plogCount}
   factory RankingEntry.fromApiJson(Map<String, dynamic> json,
       {bool isMe = false}) =>
       RankingEntry(
         rank: (json['rank'] as num?)?.toInt() ?? 0,
         userId: (json['userId'] as num?)?.toInt() ?? 0,
         nickname: json['nickname'] as String? ?? '',
-        levelName: json['levelName'] as String? ?? 'Lv.${json['level'] ?? 1}',
+        levelName: json['levelTitle'] as String? ??
+            json['levelName'] as String? ?? '',
         level: (json['level'] as num?)?.toInt() ?? 1,
         weeklyExp: (json['exp'] as num?)?.toInt() ?? 0,
         isMe: isMe,
