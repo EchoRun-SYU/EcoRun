@@ -8,8 +8,8 @@ import 'main_scaffold.dart';
 import 'nickname_setup_screen.dart';
 
 final _googleSignIn = GoogleSignIn(
-  serverClientId:
-      '841154792818-tksoljcs8unr95c5cbnao1ppfqgfu05p.apps.googleusercontent.com',
+  clientId: '841154792818-q8c13pgi6k5kt1npi00e4ufo04t9ohgg.apps.googleusercontent.com',
+  serverClientId: '841154792818-tksoljcs8unr95c5cbnao1ppfqgfu05p.apps.googleusercontent.com',
   scopes: ['email', 'profile'],
 );
 
