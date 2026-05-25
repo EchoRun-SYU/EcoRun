@@ -3,11 +3,6 @@ allprojects {
         google()
         mavenCentral()
     }
-    plugins.withId("com.android.library") {
-        extensions.configure<com.android.build.gradle.LibraryExtension> {
-            compileSdk = 36
-        }
-    }
 }
 
 val newBuildDir: Directory =
