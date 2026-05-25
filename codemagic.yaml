@@ -12,10 +12,16 @@ workflows:
         script: flutter pub get
       - name: Decode keystore
         script: |
+          echo "=== ENV CHECK ==="
+          echo "KEYSTORE_PASSWORD length: ${#KEYSTORE_PASSWORD}"
+          echo "KEY_PASSWORD length:      ${#KEY_PASSWORD}"
+          echo "KEY_ALIAS:                $KEY_ALIAS"
+          echo "KEYSTORE_BASE64 length:   ${#KEYSTORE_BASE64}"
+          echo "================="
           python3 -c "import base64,os,sys; raw=os.environ.get('KEYSTORE_BASE64',''); sys.exit('ERROR: KEYSTORE_BASE64 not set') if not raw else None; data=base64.b64decode(raw); sys.exit(f'ERROR: keystore too small ({len(data)}B)') if len(data)<100 else None; open(os.environ['CM_BUILD_DIR']+'/ecorun-release.jks','wb').write(data); print(f'Keystore decoded: {len(data)} bytes')"
           echo "KEYSTORE_PATH=$CM_BUILD_DIR/ecorun-release.jks" >> $CM_ENV
           keytool -list -keystore "$CM_BUILD_DIR/ecorun-release.jks" \
-            -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>&1 | head -5
+            -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>&1
       - name: Build APK
         script: flutter build apk --release
       - name: Build App Bundle
