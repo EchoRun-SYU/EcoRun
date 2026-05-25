@@ -28,27 +28,26 @@ workflows:
           failure: true
 
   ios-sideload-workflow:
-    name: iOS Sideload Build (무료 Apple ID)
+    name: iOS Sideload Build (무서명 — Sideloadly로 로컬 서명)
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
       flutter: stable
-      ios_signing:
-        distribution_type: development  # 무료 Apple ID 사용, 7일 유효
-        bundle_identifier: com.syu.ecorun
       vars:
         MAPS_API_KEY: $MAPS_API_KEY
     scripts:
       - name: Get dependencies
         script: flutter pub get
-      - name: Apply provisioning profiles
-        script: xcode-project use-profiles
-      - name: Build IPA
+      - name: Build iOS (unsigned)
+        script: flutter build ios --release --no-codesign
+      - name: Package as unsigned IPA
         script: |
-          flutter build ipa --release \
-            --export-options-plist=$HOME/export_options.plist
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r EcoRun-unsigned.ipa Payload/
     artifacts:
-      - build/ios/ipa/*.ipa
+      - build/ios/iphoneos/EcoRun-unsigned.ipa
     publishing:
       email:
         recipients:
