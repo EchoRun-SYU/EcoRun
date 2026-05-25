@@ -1,10 +1,13 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import '../app_theme.dart';
 import 'main_scaffold.dart';
 
-class RunSummaryScreen extends StatelessWidget {
+class RunSummaryScreen extends StatefulWidget {
   final int seconds;
   final double distance;
   final int calories;
@@ -22,37 +25,56 @@ class RunSummaryScreen extends StatelessWidget {
     this.routePoints = const [],
   });
 
+  @override
+  State<RunSummaryScreen> createState() => _RunSummaryScreenState();
+}
+
+class _RunSummaryScreenState extends State<RunSummaryScreen> {
+  final _shareCardKey = GlobalKey();
+
   String get _timeDisplay {
-    final h = seconds ~/ 3600;
-    final m = (seconds % 3600) ~/ 60;
-    final s = seconds % 60;
+    final h = widget.seconds ~/ 3600;
+    final m = (widget.seconds % 3600) ~/ 60;
+    final s = widget.seconds % 60;
     return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
   String get _pace {
-    if (distance < 0.01) return "8'24\"";
-    final paceSeconds = (seconds / distance).round();
+    if (widget.distance < 0.01) return "8'24\"";
+    final paceSeconds = (widget.seconds / widget.distance).round();
     final pm = paceSeconds ~/ 60;
     final ps = paceSeconds % 60;
     return "$pm'${ps.toString().padLeft(2, '0')}\"";
-  }
-
-  void _shareResult() {
-    final text = '🌱 EcoRun 플로깅 완료!\n'
-        '📅 $_dateString\n'
-        '⏱️ 시간: $_timeDisplay\n'
-        '🏃 거리: ${distance.toStringAsFixed(2)} km\n'
-        '🗑️ 수거: $collected 개\n'
-        '⚡ 획득 EXP: +$expGained\n'
-        '평균 페이스: $_pace\n\n'
-        '#EcoRun #플로깅 #환경보호';
-    Share.share(text);
   }
 
   String get _dateString {
     final now = DateTime.now();
     const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
     return '${now.month}월 ${now.day}일 ${weekdays[now.weekday - 1]}요일';
+  }
+
+  Future<void> _shareResult() async {
+    try {
+      final boundary =
+          _shareCardKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) throw Exception('이미지 변환 실패');
+      final bytes = byteData.buffer.asUint8List();
+
+      await Share.shareXFiles(
+        [XFile.fromData(bytes, name: 'ecorun_plogging.png', mimeType: 'image/png')],
+        text: '#EcoRun #갓생살기 #플로깅',
+      );
+    } catch (_) {
+      await Share.share(
+        '🌱 EcoRun 플로깅 완료!\n'
+        '⏱️ 시간: $_timeDisplay\n'
+        '🏃 거리: ${widget.distance.toStringAsFixed(2)} km\n'
+        '🗑️ 수거: ${widget.collected} 개\n'
+        '#EcoRun #갓생살기 #플로깅',
+      );
+    }
   }
 
   @override
@@ -90,188 +112,276 @@ class RunSummaryScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Expanded(
-            child: Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withAlpha(8),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4))
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Stack(
-                  children: [
-                    _buildSummaryMap(),
-                    Positioned(
-                      top: 12,
-                      left: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryContainer,
-                          borderRadius: BorderRadius.circular(20),
+          Column(
+            children: [
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withAlpha(8),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4))
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Stack(
+                      children: [
+                        _buildSummaryMap(),
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryContainer,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text('EcoRun',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12)),
+                          ),
                         ),
-                        child: const Text('EcoRun',
+                        Positioned(
+                          bottom: 12,
+                          left: 12,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.access_time_rounded,
+                                  size: 14, color: AppColors.onSurfaceVariant),
+                              const SizedBox(width: 4),
+                              Text(_timeDisplay,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium
+                                      ?.copyWith(fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 12,
+                          right: 12,
+                          child: Text(
+                            '${widget.distance.toStringAsFixed(2)} KM',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(color: AppColors.primary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLowest,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withAlpha(8),
+                          blurRadius: 16,
+                          offset: const Offset(0, 2))
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      _stat(context, _pace, '평균 페이스'),
+                      _divider(),
+                      _stat(context, '${widget.calories}', '칼로리'),
+                      _divider(),
+                      _stat(context, '${widget.collected}', '수거 완료'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.bolt_rounded,
+                          color: Colors.white, size: 22),
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text('플로깅 완료!',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12)),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14)),
                       ),
+                      Text('+${widget.expGained}',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800)),
+                      const Text(' EXP',
+                          style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _buildCarbonSection(),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _shareResult,
+                      icon: const Icon(Icons.share_rounded, size: 18),
+                      label: const Text('공유하기'),
                     ),
-                    Positioned(
-                      bottom: 12,
-                      left: 12,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.access_time_rounded,
-                              size: 14, color: AppColors.onSurfaceVariant),
-                          const SizedBox(width: 4),
-                          Text(_timeDisplay,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700)),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 12,
-                      right: 12,
-                      child: Text(
-                        '${distance.toStringAsFixed(2)} KM',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(color: AppColors.primary),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const MainScaffold()),
+                          (_) => false,
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(
+                              color: AppColors.outlineVariant),
+                          shape: const StadiumBorder(),
+                        ),
+                        child: Text('플로깅 종료하기',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    color: AppColors.onSurfaceVariant)),
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 32),
+            ],
+          ),
+          // 오프스크린 공유 카드 — RepaintBoundary로 PNG 캡처용
+          Transform.translate(
+            offset: const Offset(-9999, 0),
+            child: RepaintBoundary(
+              key: _shareCardKey,
+              child: _buildShareCard(),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLowest,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withAlpha(8),
-                      blurRadius: 16,
-                      offset: const Offset(0, 2))
-                ],
-              ),
-              child: Row(
-                children: [
-                  _stat(context, _pace, '평균 페이스'),
-                  _divider(),
-                  _stat(context, '$calories', '칼로리'),
-                  _divider(),
-                  _stat(context, '$collected', '수거 완료'),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
-                color: AppColors.primaryContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.bolt_rounded,
-                      color: Colors.white, size: 22),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text('플로깅 완료!',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14)),
-                  ),
-                  Text('+$expGained',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800)),
-                  const Text(' EXP',
-                      style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: _buildCarbonSection(),
-          ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _shareResult,
-                  icon: const Icon(Icons.share_rounded, size: 18),
-                  label: const Text('공유하기'),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const MainScaffold()),
-                      (_) => false,
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side:
-                          const BorderSide(color: AppColors.outlineVariant),
-                      shape: const StadiumBorder(),
-                    ),
-                    child: Text('플로깅 종료하기',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(
-                                color: AppColors.onSurfaceVariant)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 32),
         ],
       ),
     );
   }
 
+  Widget _buildShareCard() {
+    final distanceStr = widget.distance.toStringAsFixed(2);
+
+    return SizedBox(
+      width: 360,
+      height: 280,
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF059669), AppColors.primaryContainer],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 메달 아이콘
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(50),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.military_tech_rounded,
+                color: Colors.white,
+                size: 38,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // 달성 문구
+            Text(
+              '플로깅 ${distanceStr}km 달성!',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            // 수거 완료 문구
+            Text(
+              '쓰레기 ${widget.collected}개 수거 완료',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white70,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 20),
+            // 해시태그 pill
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white38, width: 1.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '#EcoRun #갓생살기 #플로깅',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSummaryMap() {
-    final hasRoute = routePoints.isNotEmpty;
+    final hasRoute = widget.routePoints.isNotEmpty;
     final center = hasRoute
-        ? routePoints[routePoints.length ~/ 2]
+        ? widget.routePoints[widget.routePoints.length ~/ 2]
         : const LatLng(37.5665, 126.9780);
 
     return GoogleMap(
@@ -287,7 +397,7 @@ class RunSummaryScreen extends StatelessWidget {
           ? {
               Polyline(
                 polylineId: const PolylineId('summary_route'),
-                points: routePoints,
+                points: widget.routePoints,
                 color: AppColors.primaryContainer,
                 width: 5,
                 startCap: Cap.roundCap,
@@ -299,13 +409,13 @@ class RunSummaryScreen extends StatelessWidget {
           ? {
               Marker(
                 markerId: const MarkerId('start'),
-                position: routePoints.first,
+                position: widget.routePoints.first,
                 icon: BitmapDescriptor.defaultMarkerWithHue(
                     BitmapDescriptor.hueGreen),
               ),
               Marker(
                 markerId: const MarkerId('end'),
-                position: routePoints.last,
+                position: widget.routePoints.last,
                 icon: BitmapDescriptor.defaultMarkerWithHue(
                     BitmapDescriptor.hueRed),
               ),
@@ -338,8 +448,8 @@ class RunSummaryScreen extends StatelessWidget {
       Container(width: 1, height: 32, color: AppColors.outlineVariant);
 
   Widget _buildCarbonSection() {
-    final drivingCarbonG = (distance * 210).round();
-    final trashCarbonG = collected * 83;
+    final drivingCarbonG = (widget.distance * 210).round();
+    final trashCarbonG = widget.collected * 83;
     final totalCarbonG = drivingCarbonG + trashCarbonG;
     final treeDays = (totalCarbonG / 60).round();
     final carbonDisplay = totalCarbonG >= 1000
@@ -388,8 +498,7 @@ class RunSummaryScreen extends StatelessWidget {
                             fontWeight: FontWeight.w800,
                             fontSize: 14)),
                     Text('달리기 + 쓰레기 수거 합산',
-                        style:
-                            TextStyle(color: Colors.white70, fontSize: 10)),
+                        style: TextStyle(color: Colors.white70, fontSize: 10)),
                   ],
                 ),
               ),
@@ -421,7 +530,8 @@ class RunSummaryScreen extends StatelessWidget {
         const SizedBox(height: 10),
         Row(
           children: [
-            _carbonChip('🏃',
+            _carbonChip(
+                '🏃',
                 drivingCarbonG >= 1000
                     ? '${(drivingCarbonG / 1000).toStringAsFixed(1)}kg'
                     : '${drivingCarbonG}g',
@@ -446,14 +556,12 @@ class RunSummaryScreen extends StatelessWidget {
       {Color? valueColor}) {
     return Expanded(
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
         decoration: BoxDecoration(
           color: AppColors.surfaceLowest,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(
-                color: Colors.black.withAlpha(8), blurRadius: 8),
+            BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 8),
           ],
         ),
         child: Column(

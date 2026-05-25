@@ -112,7 +112,9 @@
       "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-9.1.0-all\" -Recurse -Filter \"gradle.bat\" -ErrorAction SilentlyContinue | Select-Object -First 3 FullName)",
       "PowerShell($gradleDir = \"$env:USERPROFILE\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-9.1.0-all\"; Get-ChildItem $gradleDir -Recurse -Name \"gradle\" -ErrorAction SilentlyContinue | Select-Object -First 5)",
       "PowerShell($gradleBin = \"$env:USERPROFILE\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-9.1.0-all\\\\7wzd0jkjit61aq2p43wpjgij9\\\\gradle-9.1.0\\\\bin\\\\gradle.bat\"; if \\(Test-Path $gradleBin\\) { \"Found\" } else { \"Not found\" })",
-      "PowerShell($gradleBin = \"$env:USERPROFILE\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-9.1.0-all\\\\7wzd0jkjit61aq2p43wpjgij9\\\\gradle-9.1.0\\\\bin\\\\gradle.bat\"; Set-Location \"z:\\\\programming\\\\SYU-EcoRun\\\\ecorunBackend\"; & $gradleBin compileJava 2>&1 | Select-Object -Last 50)"
+      "PowerShell($gradleBin = \"$env:USERPROFILE\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-9.1.0-all\\\\7wzd0jkjit61aq2p43wpjgij9\\\\gradle-9.1.0\\\\bin\\\\gradle.bat\"; Set-Location \"z:\\\\programming\\\\SYU-EcoRun\\\\ecorunBackend\"; & $gradleBin compileJava 2>&1 | Select-Object -Last 50)",
+      "Bash(Get-ChildItem -Path \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\lib\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ],
     "additionalDirectories": [
       "C:\\Users\\KEIN\\AppData\\Local\\Temp"
