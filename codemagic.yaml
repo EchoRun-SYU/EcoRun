@@ -12,7 +12,7 @@ workflows:
         script: flutter pub get
       - name: Decode keystore
         script: |
-          echo $KEYSTORE_BASE64 | base64 --decode > $CM_BUILD_DIR/ecorun-release.jks
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > $CM_BUILD_DIR/ecorun-release.jks
           echo "KEYSTORE_PATH=$CM_BUILD_DIR/ecorun-release.jks" >> $CM_ENV
       - name: Build APK
         script: flutter build apk --release
