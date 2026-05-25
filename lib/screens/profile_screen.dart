@@ -6,6 +6,8 @@ import '../models/badge_model.dart';
 import '../services/api_service.dart';
 import '../state/app_state.dart';
 import 'settings_screen.dart';
+import 'my_records_screen.dart';
+import 'profile_settings_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -119,10 +121,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
+                                  builder: (_) =>
+                                      const ProfileSettingsScreen()),
+                            ),
+                            icon: const Icon(Icons.edit_outlined,
+                                color: AppColors.onSurfaceVariant),
+                            tooltip: '프로필 설정',
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
                                   builder: (_) => const SettingsScreen()),
                             ),
                             icon: const Icon(Icons.settings_outlined,
                                 color: AppColors.onSurfaceVariant),
+                            tooltip: '설정',
                           ),
                         ],
                       ),
@@ -281,6 +295,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // 내 기록 바로가기
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const MyRecordsScreen()),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceLowest,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black.withAlpha(8),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 2))
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryContainer
+                                      .withAlpha(25),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                    Icons.history_rounded,
+                                    color: AppColors.primaryContainer,
+                                    size: 20),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text('내 기록',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                                fontWeight:
+                                                    FontWeight.w700)),
+                                    Text('전체 플로깅 기록 보기',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium
+                                            ?.copyWith(fontSize: 12)),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.arrow_forward_ios_rounded,
+                                  size: 14, color: AppColors.outlineVariant),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),

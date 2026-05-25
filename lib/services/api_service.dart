@@ -184,6 +184,16 @@ class ApiService {
     );
   }
 
+  // ── profile ────────────────────────────────────────────────
+  Future<void> updateProfile({String? nickname}) async {
+    if (nickname == null) return;
+    final uri = Uri.parse('$_base/users/me');
+    final res = await http.patch(uri,
+        headers: _headers, body: json.encode({'nickname': nickname}));
+    if (res.statusCode < 400) return;
+    throw Exception('API ${res.statusCode}: ${res.body}');
+  }
+
   // ── exp ────────────────────────────────────────────────────
   Future<Map<String, dynamic>> addExp(int amount) async {
     return _post('/exp',

@@ -102,7 +102,10 @@
       "Bash(python3 -c ' *)",
       "Bash(/c/Users/KEIN/.jdks/corretto-17.0.14/bin/keytool -list -keystore z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun/ecorun-release.jks -storepass ecorun0525)",
       "Bash(/c/Users/KEIN/.jdks/corretto-17.0.14/bin/keytool -genkeypair -keystore z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun/ecorun-release.jks -storetype PKCS12 -alias ecorun -keyalg RSA -keysize 2048 -validity 10000 -storepass ecorun0525 -keypass ecorun0525 -dname 'CN=EcoRun, OU=SYU, O=SYU, L=Seoul, ST=Seoul, C=KR')",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "Bash(xargs grep -l \"runs\")",
+      "Bash(xargs cat)",
+      "Bash(gradlew.bat compileJava)"
     ],
     "additionalDirectories": [
       "C:\\Users\\KEIN\\AppData\\Local\\Temp"
