@@ -1,5 +1,5 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../app_theme.dart';
 import '../models/trash_model.dart';
 import '../services/api_service.dart';
@@ -7,11 +7,13 @@ import '../services/api_service.dart';
 class TrashResultScreen extends StatefulWidget {
   final TrashAnalyzeResult result;
   final int runId;
+  final Uint8List? imageBytes;
 
   const TrashResultScreen({
     super.key,
     required this.result,
     required this.runId,
+    this.imageBytes,
   });
 
   @override
@@ -20,28 +22,18 @@ class TrashResultScreen extends StatefulWidget {
 
 class _TrashResultScreenState extends State<TrashResultScreen> {
   bool _saving = false;
-  bool _autoPause = true;
-  bool _voiceFeedback = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-    setState(() {
-      _autoPause = prefs.getBool('settings_auto_pause') ?? true;
-      _voiceFeedback = prefs.getBool('settings_voice_feedback') ?? true;
-    });
-  }
 
   Future<void> _continueRun() async {
     if (_saving) return;
     setState(() => _saving = true);
-    await ApiService.instance.addTrashToRun(widget.runId, widget.result.totalCount);
+    final trashType = widget.result.items.isNotEmpty
+        ? widget.result.items.first.trashType
+        : 'OTHER';
+    await ApiService.instance.addTrashToRun(
+      widget.runId,
+      widget.result.totalCount,
+      trashType: trashType,
+    );
     if (!mounted) return;
     Navigator.pop(context, widget.result.totalCount);
   }
@@ -49,9 +41,6 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
   @override
   Widget build(BuildContext context) {
     final result = widget.result;
-    final tags = result.items
-        .map((item) => '${item.trashType} x${item.count}')
-        .toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -61,9 +50,7 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded,
               color: AppColors.onSurface),
-          onPressed: _saving
-              ? null
-              : () => Navigator.pop(context, 0),
+          onPressed: _saving ? null : () => Navigator.pop(context, 0),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,92 +84,50 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Status card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLowest,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withAlpha(8),
-                      blurRadius: 16,
-                      offset: const Offset(0, 2))
-                ],
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Text('EcoRun',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelMedium
-                              ?.copyWith(
-                                  color: AppColors.primaryContainer,
-                                  fontWeight: FontWeight.w700)),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                            color: AppColors.primaryContainer.withAlpha(30),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.check_circle_rounded,
-                                size: 14, color: AppColors.primaryContainer),
-                            const SizedBox(width: 4),
-                            Text('인증 완료',
-                                style: TextStyle(
-                                    color: AppColors.primaryContainer,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _settingRow(context, Icons.wifi_tethering_rounded,
-                      '러닝 위치 공유', true),
-                  const SizedBox(height: 8),
-                  _settingRow(context, Icons.pause_circle_outline_rounded,
-                      '자동 일시 중지', _autoPause),
-                  const SizedBox(height: 8),
-                  _settingRow(
-                      context, Icons.volume_up_outlined, '음성 피드백', _voiceFeedback),
-                ],
-              ),
+            // 인증 사진 오버레이 (사진이 있을 때)
+            if (widget.imageBytes != null)
+              _buildPhotoHero(widget.imageBytes!, result),
+            // 인증된 수거 목록 헤더
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text('인증된 수거 목록',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryContainer,
+                      )),
             ),
-            const SizedBox(height: 12),
-            // Trash tags
-            Wrap(
-              spacing: 8,
-              children: tags
-                  .map((t) => _trashTag(t, AppColors.primaryContainer))
-                  .toList(),
-            ),
-            const SizedBox(height: 20),
-            Text('인증된 수거 목록',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryContainer,
-                    )),
-            const SizedBox(height: 12),
             ...result.items.map((item) => _collectItem(context, item)),
             const SizedBox(height: 16),
-            // EXP banner
+            // EXP 배너
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: AppColors.primaryContainer,
-                borderRadius: BorderRadius.circular(16),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFB923C), AppColors.secondaryContainer],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.secondaryContainer.withAlpha(70),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.bolt_rounded, color: Colors.white, size: 24),
-                  const SizedBox(width: 8),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(50),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.bolt_rounded,
+                        color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       '총 ${result.totalCount}개 수거 완료',
@@ -195,9 +140,9 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
                   Text('+${result.totalExp}',
                       style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 26,
+                          fontSize: 28,
                           fontWeight: FontWeight.w800)),
-                  const Text('EXP',
+                  const Text(' EXP',
                       style: TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -206,7 +151,7 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Continue button
+            // 계속하기 버튼
             SizedBox(
               width: double.infinity,
               height: 52,
@@ -215,7 +160,8 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.secondaryContainer,
                   foregroundColor: Colors.white,
-                  shape: const StadiumBorder(),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                 ),
                 icon: _saving
                     ? const SizedBox(
@@ -236,35 +182,101 @@ class _TrashResultScreenState extends State<TrashResultScreen> {
     );
   }
 
-  Widget _settingRow(
-      BuildContext context, IconData icon, String label, bool value) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: AppColors.onSurfaceVariant),
-        const SizedBox(width: 10),
-        Expanded(
-            child: Text(label,
-                style: Theme.of(context).textTheme.bodyMedium)),
-        Icon(
-          value ? Icons.toggle_on_rounded : Icons.toggle_off_rounded,
-          color: value ? AppColors.primaryContainer : AppColors.outline,
-          size: 32,
-        ),
-      ],
-    );
-  }
-
-  Widget _trashTag(String label, Color color) {
+  Widget _buildPhotoHero(Uint8List bytes, TrashAnalyzeResult result) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withAlpha(20),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withAlpha(60)),
+        child: AspectRatio(
+          aspectRatio: 4 / 3,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.memory(bytes, fit: BoxFit.cover),
+              // 하단 그라디언트
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withAlpha(140)],
+                    stops: const [0.5, 1.0],
+                  ),
+                ),
+              ),
+              // EcoRun 워터마크
+              const Positioned(
+                top: 12,
+                left: 12,
+                child: Row(
+                  children: [
+                    Icon(Icons.eco_rounded, size: 13, color: Colors.white),
+                    SizedBox(width: 4),
+                    Text('EcoRun',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12)),
+                  ],
+                ),
+              ),
+              // 인증 완료 뱃지
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryContainer.withAlpha(235),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check_circle_rounded,
+                          size: 12, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text('인증 완료',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 11)),
+                    ],
+                  ),
+                ),
+              ),
+              // 하단 수거 아이템 태그
+              Positioned(
+                bottom: 12,
+                left: 12,
+                right: 12,
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: result.items
+                      .map((item) => Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withAlpha(100),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${item.trashType} ×${item.count}',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 11),
+                            ),
+                          ))
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      child: Text(label,
-          style: TextStyle(
-              color: color, fontSize: 13, fontWeight: FontWeight.w600)),
     );
   }
 

@@ -68,22 +68,24 @@ class TrashAnalyzeResult {
             .toList(),
       );
 
-  // Real API: POST /trash/analyze → {trashType, pointsEarned, confidence, message}
+  // Real API: POST /trash/analyze → {trashType, trashCount, pointsEarned, confidence, message}
   factory TrashAnalyzeResult.fromApiJson(Map<String, dynamic> json) {
     final trashType = json['trashType'] as String? ?? '쓰레기';
-    final points = (json['pointsEarned'] as num?)?.toInt() ?? 10;
+    final count = (json['trashCount'] as num?)?.toInt() ?? 1;
+    final pointsEach = (json['pointsEarned'] as num?)?.toInt() ?? 10;
+    final totalExp = pointsEach * count;
     final item = TrashAnalyzeItem(
       id: 'api_1',
       trashType: trashType,
       iconKey: _iconKeyFor(trashType),
-      count: 1,
-      expEach: points,
-      totalExp: points,
+      count: count,
+      expEach: pointsEach,
+      totalExp: totalExp,
     );
     return TrashAnalyzeResult(
       success: true,
-      totalCount: 1,
-      totalExp: points,
+      totalCount: count,
+      totalExp: totalExp,
       items: [item],
     );
   }

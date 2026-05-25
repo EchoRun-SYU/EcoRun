@@ -176,10 +176,14 @@ class ApiService {
   }
 
   Future<void> addTrashToRun(int runId, int trashCount,
-      {String photoUrl = ''}) async {
+      {String photoUrl = '', String trashType = 'OTHER'}) async {
     await _post(
       '/runs/$runId/trash',
-      body: {'trashCount': trashCount, 'photoUrl': photoUrl},
+      body: {
+        'trashCount': trashCount,
+        'photoUrl': photoUrl,
+        'trashType': trashType,
+      },
       params: {'userId': '${AppState.instance.userId}'},
     );
   }

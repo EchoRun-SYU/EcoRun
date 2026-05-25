@@ -224,6 +224,11 @@ class RunSummaryScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _buildCarbonSection(),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 ElevatedButton.icon(
@@ -331,4 +336,148 @@ class RunSummaryScreen extends StatelessWidget {
 
   Widget _divider() =>
       Container(width: 1, height: 32, color: AppColors.outlineVariant);
+
+  Widget _buildCarbonSection() {
+    final drivingCarbonG = (distance * 210).round();
+    final trashCarbonG = collected * 83;
+    final totalCarbonG = drivingCarbonG + trashCarbonG;
+    final treeDays = (totalCarbonG / 60).round();
+    final carbonDisplay = totalCarbonG >= 1000
+        ? '${(totalCarbonG / 1000).toStringAsFixed(2)} kg'
+        : '$totalCarbonG g';
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF059669), AppColors.primaryContainer],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryContainer.withAlpha(70),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(50),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.air_rounded,
+                    color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('탄소 절감량',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14)),
+                    Text('달리기 + 쓰레기 수거 합산',
+                        style:
+                            TextStyle(color: Colors.white70, fontSize: 10)),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: carbonDisplay,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 22,
+                          fontFamily: 'PlusJakartaSans'),
+                    ),
+                    const TextSpan(
+                      text: ' CO₂',
+                      style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                          fontFamily: 'PlusJakartaSans'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _carbonChip('🏃',
+                drivingCarbonG >= 1000
+                    ? '${(drivingCarbonG / 1000).toStringAsFixed(1)}kg'
+                    : '${drivingCarbonG}g',
+                '달리기 절감'),
+            const SizedBox(width: 8),
+            _carbonChip(
+                '♻️',
+                trashCarbonG >= 1000
+                    ? '${(trashCarbonG / 1000).toStringAsFixed(1)}kg'
+                    : '${trashCarbonG}g',
+                '수거 절감'),
+            const SizedBox(width: 8),
+            _carbonChip('🌳', '$treeDays일', '나무 흡수 환산',
+                valueColor: AppColors.primaryContainer),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _carbonChip(String emoji, String value, String label,
+      {Color? valueColor}) {
+    return Expanded(
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLowest,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withAlpha(8), blurRadius: 8),
+          ],
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                color: valueColor ?? AppColors.onSurface,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                  color: AppColors.outline, fontSize: 9),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
