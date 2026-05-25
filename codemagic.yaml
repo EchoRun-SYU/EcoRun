@@ -4,9 +4,12 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: stable
-      groups:
-        - android_signing
-        - api_keys
+      vars:
+        KEYSTORE_BASE64: $KEYSTORE_BASE64
+        KEYSTORE_PASSWORD: $KEYSTORE_PASSWORD
+        KEY_ALIAS: $KEY_ALIAS
+        KEY_PASSWORD: $KEY_PASSWORD
+        MAPS_API_KEY: $MAPS_API_KEY
     scripts:
       - name: Get dependencies
         script: flutter pub get
@@ -36,8 +39,8 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       flutter: stable
-      groups:
-        - api_keys
+      vars:
+        MAPS_API_KEY: $MAPS_API_KEY
     scripts:
       - name: Get dependencies
         script: flutter pub get
