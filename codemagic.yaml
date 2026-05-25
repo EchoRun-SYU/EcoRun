@@ -6,9 +6,17 @@ workflows:
       flutter: stable
       vars:
         MAPS_API_KEY: $MAPS_API_KEY
+        # CodeMagic 대시보드 > Environment variables 에 아래 4개를 추가할 것
+        KEYSTORE_PASSWORD: $KEYSTORE_PASSWORD
+        KEY_ALIAS: $KEY_ALIAS
+        KEY_PASSWORD: $KEY_PASSWORD
     scripts:
       - name: Get dependencies
         script: flutter pub get
+      - name: Decode keystore
+        script: |
+          echo $KEYSTORE_BASE64 | base64 --decode > $CM_BUILD_DIR/ecorun-release.jks
+          echo "KEYSTORE_PATH=$CM_BUILD_DIR/ecorun-release.jks" >> $CM_ENV
       - name: Build APK
         script: flutter build apk --release
       - name: Build App Bundle
@@ -36,6 +44,13 @@ workflows:
     scripts:
       - name: Get dependencies
         script: flutter pub get
+      - name: Generate LocalConfig.swift
+        script: |
+          cat > ios/Runner/LocalConfig.swift <<EOF
+          struct LocalConfig {
+              static let googleMapsAPIKey = "$MAPS_API_KEY"
+          }
+          EOF
       - name: Build iOS (unsigned)
         script: flutter build ios --release --no-codesign
       - name: Package as unsigned IPA
