@@ -87,7 +87,9 @@
       "Bash(git push *)",
       "Bash(New-Item -ItemType Directory -Force \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ios\\\\Runner.xcworkspace\\\\xcshareddata\\\\xcschemes\")",
       "Bash(findstr \"IPHONEOS_DEPLOYMENT_TARGET\")",
-      "PowerShell(& \"Z:\\\\Android\\\\AndroidStudio\\\\jbr\\\\bin\\\\keytool.exe\" -genkey -v -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -keyalg RSA -keysize 2048 -validity 10000 -alias ecorun -dname \"CN=EcoRun, OU=SYU, O=EcoRun, L=Seoul, S=Seoul, C=KR\" -storepass ecorun2024 -keypass ecorun2024)"
+      "PowerShell(& \"Z:\\\\Android\\\\AndroidStudio\\\\jbr\\\\bin\\\\keytool.exe\" -genkey -v -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -keyalg RSA -keysize 2048 -validity 10000 -alias ecorun -dname \"CN=EcoRun, OU=SYU, O=EcoRun, L=Seoul, S=Seoul, C=KR\" -storepass ecorun2024 -keypass ecorun2024)",
+      "PowerShell(& \"Z:\\\\Android\\\\AndroidStudio\\\\jbr\\\\bin\\\\keytool.exe\" -genkey -v -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -alias ecorun -keyalg RSA -keysize 2048 -validity 10000 -storepass ecorun0525 -keypass ecorun0525 -dname \"CN=EcoRun, OU=SYU, O=SYU, L=Seoul, S=Seoul, C=KR\")",
+      "PowerShell([Convert]::ToBase64String\\([IO.File]::ReadAllBytes\\(\"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\"\\)\\) | Out-File -FilePath \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\keystore_b64.txt\" -NoNewline -Encoding ascii; Write-Host \"완료. 파일 크기: $\\(\\(Get-Item 'z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\keystore_b64.txt'\\).Length\\) bytes\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\KEIN\\AppData\\Local\\Temp"
