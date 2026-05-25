@@ -89,7 +89,20 @@
       "Bash(findstr \"IPHONEOS_DEPLOYMENT_TARGET\")",
       "PowerShell(& \"Z:\\\\Android\\\\AndroidStudio\\\\jbr\\\\bin\\\\keytool.exe\" -genkey -v -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -keyalg RSA -keysize 2048 -validity 10000 -alias ecorun -dname \"CN=EcoRun, OU=SYU, O=EcoRun, L=Seoul, S=Seoul, C=KR\" -storepass ecorun2024 -keypass ecorun2024)",
       "PowerShell(& \"Z:\\\\Android\\\\AndroidStudio\\\\jbr\\\\bin\\\\keytool.exe\" -genkey -v -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -alias ecorun -keyalg RSA -keysize 2048 -validity 10000 -storepass ecorun0525 -keypass ecorun0525 -dname \"CN=EcoRun, OU=SYU, O=SYU, L=Seoul, S=Seoul, C=KR\")",
-      "PowerShell([Convert]::ToBase64String\\([IO.File]::ReadAllBytes\\(\"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\"\\)\\) | Out-File -FilePath \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\keystore_b64.txt\" -NoNewline -Encoding ascii; Write-Host \"완료. 파일 크기: $\\(\\(Get-Item 'z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\keystore_b64.txt'\\).Length\\) bytes\")"
+      "PowerShell([Convert]::ToBase64String\\([IO.File]::ReadAllBytes\\(\"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\"\\)\\) | Out-File -FilePath \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\keystore_b64.txt\" -NoNewline -Encoding ascii; Write-Host \"완료. 파일 크기: $\\(\\(Get-Item 'z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\keystore_b64.txt'\\).Length\\) bytes\")",
+      "Bash(git -C \"z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun\" add codemagic.yaml android/app/build.gradle.kts)",
+      "Bash(git -C \"z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun\" commit -m \"fix: keystore base64 decode 방식 echo→printf 수정, 서명 변수명 충돌 해결\")",
+      "Bash(git -C \"z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun\" add codemagic.yaml)",
+      "Bash(git -C \"z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun\" commit -m \"fix: keystore decode를 base64 cli 대신 python3으로 교체 \\(인코딩 안정성\\)\")",
+      "Bash(git -C \"z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun\" commit -m \"fix: 환경변수 groups 방식 제거, vars 직접 참조 방식으로 변경\")",
+      "Bash(keytool -list -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -storepass \"\")",
+      "Bash(echo \"EXIT: $?\")",
+      "PowerShell(& keytool -list -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -storepass \"wrong\" 2>&1)",
+      "Bash(/c/Users/KEIN/.jdks/corretto-17.0.14/bin/keytool -list -keystore z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun/ecorun-release.jks -storepass ecorun0525 -storetype PKCS12)",
+      "Bash(python3 -c ' *)",
+      "Bash(/c/Users/KEIN/.jdks/corretto-17.0.14/bin/keytool -list -keystore z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun/ecorun-release.jks -storepass ecorun0525)",
+      "Bash(/c/Users/KEIN/.jdks/corretto-17.0.14/bin/keytool -genkeypair -keystore z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun/ecorun-release.jks -storetype PKCS12 -alias ecorun -keyalg RSA -keysize 2048 -validity 10000 -storepass ecorun0525 -keypass ecorun0525 -dname 'CN=EcoRun, OU=SYU, O=SYU, L=Seoul, ST=Seoul, C=KR')",
+      "Bash(Select-Object FullName)"
     ],
     "additionalDirectories": [
       "C:\\Users\\KEIN\\AppData\\Local\\Temp"

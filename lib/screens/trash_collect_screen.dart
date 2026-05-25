@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import '../app_theme.dart';
 import '../services/api_service.dart';
@@ -22,13 +23,24 @@ class _TrashCollectScreenState extends State<TrashCollectScreen> {
 
   Future<void> _pickAndAnalyze(ImageSource source) async {
     if (_analyzing) return;
-    final picked = await _picker.pickImage(source: source, imageQuality: 85);
+    final picked = await _picker.pickImage(
+      source: source,
+      maxWidth: 1920,
+      maxHeight: 1920,
+    );
     if (picked == null) return;
     setState(() => _analyzing = true);
     try {
-      final bytes = await picked.readAsBytes();
+      final rawBytes = await picked.readAsBytes();
+      final compressed = await FlutterImageCompress.compressWithList(
+        rawBytes,
+        minWidth: 1280,
+        minHeight: 1280,
+        quality: 80,
+        format: CompressFormat.webp,
+      );
       final result = await ApiService.instance
-          .analyzeTrash(bytes, mimeType: picked.mimeType);
+          .analyzeTrash(compressed, mimeType: 'image/webp');
       if (!mounted) return;
       final count = await Navigator.push<int>(
         context,

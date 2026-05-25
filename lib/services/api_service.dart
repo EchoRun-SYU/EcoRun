@@ -161,10 +161,11 @@ class ApiService {
     }
     final resolved = mimeType ?? 'image/jpeg';
     final parts = resolved.split('/');
-    final contentType = MediaType(parts[0], parts.length > 1 ? parts[1] : 'jpeg');
+    final subtype = parts.length > 1 ? parts[1] : 'jpeg';
+    final contentType = MediaType(parts[0], subtype);
     request.files.add(http.MultipartFile.fromBytes(
       'image', imageBytes,
-      filename: 'trash.jpg',
+      filename: 'trash.$subtype',
       contentType: contentType,
     ));
     final streamed = await request.send();
