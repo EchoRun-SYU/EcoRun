@@ -83,7 +83,8 @@
       "Bash(git -C \"z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun\" add lib/main.dart lib/screens/ranking_screen.dart lib/services/api_service.dart CLAUDE.md)",
       "Bash(git -C \"z:/programming/SYU-EcoRun/ecoRunFrontend/ecorun\" add lib/models/level_model.dart lib/models/ranking_model.dart)",
       "Bash(flutter --version)",
-      "Bash(flutter doctor *)"
+      "Bash(flutter doctor *)",
+      "Bash(git push *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\KEIN\\AppData\\Local\\Temp"
