@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../models/user_model.dart';
 import '../models/level_model.dart';
@@ -150,16 +151,21 @@ class ApiService {
   }
 
   // ── trash ──────────────────────────────────────────────────
-  Future<TrashAnalyzeResult> analyzeTrash(Uint8List imageBytes) async {
+  Future<TrashAnalyzeResult> analyzeTrash(Uint8List imageBytes,
+      {String? mimeType}) async {
     final uri = Uri.parse('$_base/trash/analyze');
     final request = http.MultipartRequest('POST', uri);
     final token = AppState.instance.authToken;
     if (token.isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $token';
     }
+    final resolved = mimeType ?? 'image/jpeg';
+    final parts = resolved.split('/');
+    final contentType = MediaType(parts[0], parts.length > 1 ? parts[1] : 'jpeg');
     request.files.add(http.MultipartFile.fromBytes(
       'image', imageBytes,
       filename: 'trash.jpg',
+      contentType: contentType,
     ));
     final streamed = await request.send();
     final res = await http.Response.fromStream(streamed);

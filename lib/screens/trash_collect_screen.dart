@@ -27,7 +27,8 @@ class _TrashCollectScreenState extends State<TrashCollectScreen> {
     setState(() => _analyzing = true);
     try {
       final bytes = await picked.readAsBytes();
-      final result = await ApiService.instance.analyzeTrash(bytes);
+      final result = await ApiService.instance
+          .analyzeTrash(bytes, mimeType: picked.mimeType);
       if (!mounted) return;
       Navigator.pushReplacement(
         context,

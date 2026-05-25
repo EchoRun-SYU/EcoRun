@@ -1,0 +1,62 @@
+workflows:
+  android-workflow:
+    name: Android Release Build
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      android_signing:
+        - ecorun_keystore
+      vars:
+        MAPS_API_KEY: $MAPS_API_KEY
+    scripts:
+      - name: Get dependencies
+        script: flutter pub get
+      - name: Build APK
+        script: flutter build apk --release
+      - name: Build App Bundle
+        script: flutter build appbundle --release
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - yearsingle@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  ios-sideload-workflow:
+    name: iOS Sideload Build (무료 Apple ID)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      flutter: stable
+      ios_signing:
+        distribution_type: development  # 무료 Apple ID 사용, 7일 유효
+        bundle_identifier: com.syu.ecorun
+      vars:
+        MAPS_API_KEY: $MAPS_API_KEY
+    scripts:
+      - name: Get dependencies
+        script: flutter pub get
+      - name: Build iOS
+        script: flutter build ios --release --no-codesign
+      - name: Apply provisioning profiles
+        script: xcode-project use-profiles
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace ios/Runner.xcworkspace \
+            --scheme Runner \
+            --export-options-plist /Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      email:
+        recipients:
+          - yearsingle@gmail.com
+        notify:
+          success: true
+          failure: true
