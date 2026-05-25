@@ -114,7 +114,8 @@
       "PowerShell($gradleBin = \"$env:USERPROFILE\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-9.1.0-all\\\\7wzd0jkjit61aq2p43wpjgij9\\\\gradle-9.1.0\\\\bin\\\\gradle.bat\"; if \\(Test-Path $gradleBin\\) { \"Found\" } else { \"Not found\" })",
       "PowerShell($gradleBin = \"$env:USERPROFILE\\\\.gradle\\\\wrapper\\\\dists\\\\gradle-9.1.0-all\\\\7wzd0jkjit61aq2p43wpjgij9\\\\gradle-9.1.0\\\\bin\\\\gradle.bat\"; Set-Location \"z:\\\\programming\\\\SYU-EcoRun\\\\ecorunBackend\"; & $gradleBin compileJava 2>&1 | Select-Object -Last 50)",
       "Bash(Get-ChildItem -Path \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\lib\" -Recurse -Directory)",
-      "Bash(Select-Object -ExpandProperty FullName)"
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(dart run *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\KEIN\\AppData\\Local\\Temp"
