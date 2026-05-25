@@ -30,7 +30,7 @@ class _TrashCollectScreenState extends State<TrashCollectScreen> {
       final result = await ApiService.instance
           .analyzeTrash(bytes, mimeType: picked.mimeType);
       if (!mounted) return;
-      Navigator.pushReplacement(
+      final count = await Navigator.push<int>(
         context,
         MaterialPageRoute(
           builder: (_) => TrashResultScreen(
@@ -39,6 +39,8 @@ class _TrashCollectScreenState extends State<TrashCollectScreen> {
           ),
         ),
       );
+      if (!mounted) return;
+      Navigator.pop(context, count ?? 0);
     } catch (_) {
       if (mounted) setState(() => _analyzing = false);
     }
