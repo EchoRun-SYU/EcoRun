@@ -85,7 +85,9 @@
       "Bash(flutter --version)",
       "Bash(flutter doctor *)",
       "Bash(git push *)",
-      "Bash(New-Item -ItemType Directory -Force \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ios\\\\Runner.xcworkspace\\\\xcshareddata\\\\xcschemes\")"
+      "Bash(New-Item -ItemType Directory -Force \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ios\\\\Runner.xcworkspace\\\\xcshareddata\\\\xcschemes\")",
+      "Bash(findstr \"IPHONEOS_DEPLOYMENT_TARGET\")",
+      "PowerShell(& \"Z:\\\\Android\\\\AndroidStudio\\\\jbr\\\\bin\\\\keytool.exe\" -genkey -v -keystore \"z:\\\\programming\\\\SYU-EcoRun\\\\ecoRunFrontend\\\\ecorun\\\\ecorun-release.jks\" -keyalg RSA -keysize 2048 -validity 10000 -alias ecorun -dname \"CN=EcoRun, OU=SYU, O=EcoRun, L=Seoul, S=Seoul, C=KR\" -storepass ecorun2024 -keypass ecorun2024)"
     ],
     "additionalDirectories": [
       "C:\\Users\\KEIN\\AppData\\Local\\Temp"

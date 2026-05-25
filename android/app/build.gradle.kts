@@ -2,7 +2,6 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -10,6 +9,16 @@ val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
     if (f.exists()) load(f.inputStream())
 }
+
+// 릴리스 서명 키 — 로컬: local.properties / CI: 환경변수
+val keystoreFile = System.getenv("KEYSTORE_PATH")
+    ?: localProps.getProperty("KEYSTORE_PATH", "")
+val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+    ?: localProps.getProperty("KEYSTORE_PASSWORD", "")
+val keyAlias = System.getenv("KEY_ALIAS")
+    ?: localProps.getProperty("KEY_ALIAS", "ecorun")
+val keyPassword = System.getenv("KEY_PASSWORD")
+    ?: localProps.getProperty("KEY_PASSWORD", "")
 
 android {
     namespace = "com.example.ecorun"
@@ -21,24 +30,33 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystoreFile.isNotEmpty()) {
+                storeFile = file(keystoreFile)
+                storePassword = keystorePassword
+                keyAlias = keyAlias
+                keyPassword = keyPassword
+            }
+        }
+    }
+
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.ecorun"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         manifestPlaceholders["MAPS_API_KEY"] =
-            localProps.getProperty("MAPS_API_KEY", "")
+            localProps.getProperty("MAPS_API_KEY", System.getenv("MAPS_API_KEY") ?: "")
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystoreFile.isNotEmpty())
+                signingConfigs.getByName("release")
+            else
+                signingConfigs.getByName("debug")
         }
     }
 }

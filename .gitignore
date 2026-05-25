@@ -1,6 +1,8 @@
 # Secrets — never commit real keys
 .env
 ios/Runner/LocalConfig.swift
+*.jks
+*.keystore
 
 # Miscellaneous
 *.class
