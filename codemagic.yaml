@@ -4,19 +4,31 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: stable
-      vars:
-        KEYSTORE_BASE64: $KEYSTORE_BASE64
-        KEYSTORE_PASSWORD: $KEYSTORE_PASSWORD
-        KEY_ALIAS: $KEY_ALIAS
-        KEY_PASSWORD: $KEY_PASSWORD
-        MAPS_API_KEY: $MAPS_API_KEY
+      groups:
+        - android_signing
+        - api_keys
     scripts:
       - name: Get dependencies
         script: flutter pub get
       - name: Decode keystore
         script: |
-          python3 -c "import base64, os; open('$CM_BUILD_DIR/ecorun-release.jks', 'wb').write(base64.b64decode(os.environ['KEYSTORE_BASE64']))"
+          python3 -c "
+import base64, os, sys
+raw = os.environ.get('KEYSTORE_BASE64', '')
+if not raw or raw.startswith('\$'):
+    print('ERROR: KEYSTORE_BASE64 is not set in Codemagic environment variables', file=sys.stderr)
+    sys.exit(1)
+data = base64.b64decode(raw)
+if len(data) < 100:
+    print(f'ERROR: Decoded keystore is too small ({len(data)} bytes) — bad base64?', file=sys.stderr)
+    sys.exit(1)
+out = '$CM_BUILD_DIR/ecorun-release.jks'
+open(out, 'wb').write(data)
+print(f'Keystore decoded: {len(data)} bytes -> {out}')
+"
           echo "KEYSTORE_PATH=$CM_BUILD_DIR/ecorun-release.jks" >> $CM_ENV
+          keytool -list -keystore "$CM_BUILD_DIR/ecorun-release.jks" \
+            -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>&1 | head -5
       - name: Build APK
         script: flutter build apk --release
       - name: Build App Bundle
@@ -39,8 +51,8 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       flutter: stable
-      vars:
-        MAPS_API_KEY: $MAPS_API_KEY
+      groups:
+        - api_keys
     scripts:
       - name: Get dependencies
         script: flutter pub get
