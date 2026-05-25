@@ -3,6 +3,7 @@
 ios/Runner/LocalConfig.swift
 *.jks
 *.keystore
+android/local.properties
 
 # Miscellaneous
 *.class

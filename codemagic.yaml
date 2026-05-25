@@ -24,8 +24,13 @@ workflows:
           sha256sum "$CM_BUILD_DIR/ecorun-release.jks"
           echo "Expected: 917DAB9898539F34B7A9A7DF77511E94ADABBE9180731492628BDE197DBBB4E8"
           echo "================="
+          echo "=== PASSWORD CHECK ==="
+          if [ "$KEYSTORE_PASSWORD" = "ecorun0525" ]; then echo "MATCH: YES"; else echo "MATCH: NO (actual differs from ecorun0525)"; fi
+          echo "====================="
           keytool -list -keystore "$CM_BUILD_DIR/ecorun-release.jks" \
-            -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>&1
+            -storepass "$KEYSTORE_PASSWORD" 2>&1 || true
+          keytool -list -keystore "$CM_BUILD_DIR/ecorun-release.jks" \
+            -storepass "$KEYSTORE_PASSWORD" -storetype PKCS12 2>&1 || true
       - name: Build APK
         script: flutter build apk --release
       - name: Build App Bundle
