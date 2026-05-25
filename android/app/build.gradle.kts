@@ -11,14 +11,18 @@ val localProps = Properties().apply {
 }
 
 // 릴리스 서명 키 — 로컬: local.properties / CI: 환경변수
-val keystoreFile = System.getenv("KEYSTORE_PATH")
+val signingStorePath = System.getenv("KEYSTORE_PATH")
     ?: localProps.getProperty("KEYSTORE_PATH", "")
-val keystorePassword = System.getenv("KEYSTORE_PASSWORD")
+val signingStorePassword = System.getenv("KEYSTORE_PASSWORD")
     ?: localProps.getProperty("KEYSTORE_PASSWORD", "")
-val keyAlias = System.getenv("KEY_ALIAS")
+val signingKeyAlias = System.getenv("KEY_ALIAS")
     ?: localProps.getProperty("KEY_ALIAS", "ecorun")
-val keyPassword = System.getenv("KEY_PASSWORD")
+val signingKeyPassword = System.getenv("KEY_PASSWORD")
     ?: localProps.getProperty("KEY_PASSWORD", "")
+
+val hasSigningConfig = signingStorePath.isNotEmpty()
+    && signingStorePassword.isNotEmpty()
+    && signingKeyPassword.isNotEmpty()
 
 android {
     namespace = "com.example.ecorun"
@@ -32,11 +36,11 @@ android {
 
     signingConfigs {
         create("release") {
-            if (keystoreFile.isNotEmpty()) {
-                storeFile = file(keystoreFile)
-                storePassword = keystorePassword
-                keyAlias = keyAlias
-                keyPassword = keyPassword
+            if (hasSigningConfig) {
+                storeFile = file(signingStorePath)
+                storePassword = signingStorePassword
+                keyAlias = signingKeyAlias
+                keyPassword = signingKeyPassword
             }
         }
     }
@@ -53,7 +57,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystoreFile.isNotEmpty())
+            signingConfig = if (hasSigningConfig)
                 signingConfigs.getByName("release")
             else
                 signingConfigs.getByName("debug")
